@@ -12,7 +12,7 @@ app.use(express.static('public'));
 
 app.get('/words', async (request, response) => {
     try {
-        console.log(request); // colocar opção pra mudar o máximo de caracteres da palavra - max length
+        // console.log(request); // colocar opção pra mudar o máximo de caracteres da palavra - max length
         const wordnikURL = `https://api.wordnik.com/v4/words.json/randomWords?hasDictionaryDef=true&minLength=4&maxLength=14&limit=10&api_key=${WORDNIK_API_KEY}`;
         const wordnikResponse = await fetch(wordnikURL);
         const wordnikData = await wordnikResponse.json();

@@ -1,16 +1,16 @@
-const getDatabutton = document.querySelector('.get-data');
+// const getDatabutton = document.querySelector('.get-data');
 
-const inputWords = document.querySelector('.input-words');
+const inputWord = document.querySelector('.input-word');
 
 let arrayOfWords = [];
 let standByArray = [];
 let currentWord;
 
-inputWords.addEventListener('input', validateTyping);
+inputWord.addEventListener('input', validateTyping);
 
 function validateTyping() {
-    if (inputWords.value === currentWord) {
-        inputWords.value = '';
+    if (inputWord.value === currentWord) {
+        inputWord.value = '';
         console.log('Correct.');
         arrayOfWords.shift();
         keepTrackArrayOfWords();
@@ -18,7 +18,7 @@ function validateTyping() {
     }
 }
 
-getDatabutton.addEventListener('click', getWords);
+// getDatabutton.addEventListener('click', getWords);
 
 async function getWords(array) {
     const response = await fetch('/words');
@@ -32,11 +32,11 @@ async function getWords(array) {
     displayWord();
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', getWords);
-} else {
-    getWords(arrayOfWords);
-}
+// if (document.readyState === 'loading') {
+//     document.addEventListener('DOMContentLoaded', getWords);
+// } else {
+//     getWords(arrayOfWords);
+// }
 
 function displayWord() {
     console.log(arrayOfWords);
@@ -55,3 +55,34 @@ function keepTrackArrayOfWords() {
         standByArray = [];
     }
 }
+
+
+
+
+// const a = document.querySelector('.a');
+// let b = ['ola', 'como', 'vai', 'voce'];
+// let count = 0;
+
+// function displayWordsWithTypingEffect() {
+
+//     const sizeArray = b.length;
+
+//     while (count < sizeArray) {
+//         const word = b[count];
+//         const characters = word.split('');
+//         const amountOfCharacters = characters.length;
+//         console.log(word);
+//         console.log(characters);
+//         console.log(amountOfCharacters);
+
+//         characters.map((character, index) => {
+//             setTimeout(() => {
+//                 console.log(character)
+//                 console.log('----')
+//             }, index * 1000);
+//         });
+//         count++;
+//     }
+// }
+
+// displayWordsWithTypingEffect();

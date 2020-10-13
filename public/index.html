@@ -4,10 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Typing game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Slackey&display=swap" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
     <script src="script.js" defer></script>
 </head>
 <body>
-    <button class="get-data">get data</button>
-    <input type="text" class="input-words">
+    <!-- <button class="get-data">get data</button>
+    <input type="text" class="input-words"> -->
+
+    <header>
+        <h1>TYPING GAME</h1>
+        <h2>Improve your typing speed and accuracy.</h2>
+    </header>
+
+    <main>
+        <div class="main-header">
+            <h2>Type before the time runs out.</h2>
+            <div class="main-header-info">
+                <p class="current-word">cenoura</p>
+                <p class="remaining-time">10s</p>
+            </div>
+        </div>
+        <div class="main-input">
+            <input type="text" class="input-word" value="cenour">
+        </div>
+        <div class="main-difficulty">
+            <p>Level of difficulty: <span class="difficulty">easy</span></p>
+        </div>
+        <div class="main-score">
+            <p>Score: <span class="current-score">3</span></p>
+            <p>Highest score: <span class="hightest-score">12</span></p>
+        </div>
+    </main>
+
+    <button class="button-open-settings">
+        Settings
+    </button>
+
 </body>
 </html>
