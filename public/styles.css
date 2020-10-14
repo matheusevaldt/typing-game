@@ -78,7 +78,35 @@ main {
     margin-bottom: 7px;
 }
 
-.main-header p:first-child {
+.main-header-info {
+    display: flex;
+    justify-content: space-between;
+    height: 20px;
+}
+
+.load-and-display-word {
+    display: grid;
+    grid-template-areas: "loading-word";
+}
+
+.loading-word {
+    grid-area: loading-word;
+    border: 3px solid #dfdfdf;
+    border-top: 3px solid #e37b7c;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    animation: loading-spinner 1.2s linear infinite;  
+}
+
+@keyframes loading-spinner {
+    0% { transform: rotate(0deg) }
+    100% { transform: rotate(360deg) }
+}
+
+.word-to-be-typed {
+    grid-area: word-to-be-typed;
+    display: none;
     font-weight: 700;
     font-size: 0.95em;
     color: rgba(114, 97, 147, 0.9);
@@ -91,13 +119,9 @@ main {
     100% { color: rgba(114, 97, 147, 0.9) }
 } 
 
-.main-header p:last-child {
+.remaining-time {
     font-size: 0.85em;
-}
-
-.main-header-info {
-    display: flex;
-    justify-content: space-between;
+    margin: auto 0;
 }
 
 .main-input {

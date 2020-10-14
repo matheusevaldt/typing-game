@@ -1,24 +1,26 @@
-// const getDatabutton = document.querySelector('.get-data');
-
 const inputWord = document.querySelector('.input-word');
+const loandAndDisplayWord = document.querySelector('.load-and-display-word');
+const loadingWord = document.querySelector('.loading-word');
+const wordToBeTyped = document.querySelector('.word-to-be-typed');
+const remainingTime = document.querySelector('.remaining-time');
+const currentScore = document.querySelector('.current-score');
 
+let hasGameStarted = false;
 let arrayOfWords = [];
 let standByArray = [];
 let currentWord;
+let score = 0;
+let time = 10;
+let countdown;
 
+inputWord.addEventListener('input', startGame);
 inputWord.addEventListener('input', validateTyping);
 
-function validateTyping() {
-    if (inputWord.value === currentWord) {
-        inputWord.value = '';
-        console.log('Correct.');
-        arrayOfWords.shift();
-        keepTrackArrayOfWords();
-        displayWord();
-    }
-}
-
-// getDatabutton.addEventListener('click', getWords);
+// if (document.readyState === 'loading') {
+//     document.addEventListener('DOMContentLoaded', getWords);
+// } else {
+//     getWords(arrayOfWords);
+// }
 
 async function getWords(array) {
     const response = await fetch('/words');
@@ -28,20 +30,49 @@ async function getWords(array) {
         let wordAdjusted = rawWord.toLowerCase();
         array.push(wordAdjusted);
     });
-    console.log(array)
     displayWord();
 }
 
-// if (document.readyState === 'loading') {
-//     document.addEventListener('DOMContentLoaded', getWords);
-// } else {
-//     getWords(arrayOfWords);
-// }
-
 function displayWord() {
     console.log(arrayOfWords);
-    currentWord = arrayOfWords[0];
     console.log(`WORD: ${currentWord}`);
+    currentWord = arrayOfWords[0];
+    loandAndDisplayWord.style.gridTemplateAreas = 'word-to-be-typed';
+    loadingWord.style.display = 'none';
+    wordToBeTyped.style.display = 'block';
+    wordToBeTyped.innerHTML = currentWord;
+}
+
+function startGame() {
+    if (inputWord.length !== 0) {
+        countdown = setInterval(startCountdown, 1000);
+        inputWord.removeEventListener('input', startGame);
+    }
+}
+
+function startCountdown() {
+    console.log('começou')
+    time--;
+    remainingTime.innerHTML = `${time}s`;
+    if (time === 0) {
+        clearInterval(countdown);
+        console.log('TIME HAS RAN OUT');
+    }
+}
+
+function validateTyping() {
+    if (inputWord.value === currentWord) {
+        inputWord.value = '';
+        arrayOfWords.shift();
+        updateCurrentScore();
+        keepTrackArrayOfWords();
+        displayWord();
+    }
+}
+
+function updateCurrentScore() {
+    score++;
+    currentScore.innerHTML = score;
 }
 
 function keepTrackArrayOfWords() {
@@ -55,6 +86,13 @@ function keepTrackArrayOfWords() {
         standByArray = [];
     }
 }
+
+
+
+
+
+
+
 
 
 
