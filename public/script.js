@@ -4,6 +4,17 @@ const loadingWord = document.querySelector('.loading-word');
 const wordToBeTyped = document.querySelector('.word-to-be-typed');
 const remainingTime = document.querySelector('.remaining-time');
 const currentScore = document.querySelector('.current-score');
+const buttonOpenSettings = document.querySelector('.button-open-settings');
+const buttonCloseSettings = document.querySelector('.button-close-settings');
+const settings = document.querySelector('.settings');
+const buttonDisplayPreferences = document.querySelector('.button-display-preferences');
+const buttonDisplayStatistics = document.querySelector('.button-display-statistics');
+const settingsMenuBackground = document.querySelector('.settings-menu-background');
+const preferences = document.querySelector('.preferences');
+const statistics = document.querySelector('.statistics');
+const buttonEasyDifficulty = document.querySelector('.button-easy-difficulty');
+const buttonMediumDifficulty = document.querySelector('.button-medium-difficulty');
+const buttonHardDifficulty = document.querySelector('.button-hard-difficulty');
 
 let hasGameStarted = false;
 let arrayOfWords = [];
@@ -13,8 +24,17 @@ let score = 0;
 let time = 10;
 let countdown;
 
+const $difficulty = localStorage.getItem('difficulty');
+
 inputWord.addEventListener('input', startGame);
 inputWord.addEventListener('input', validateTyping);
+buttonOpenSettings.addEventListener('click', openSettings);
+buttonCloseSettings.addEventListener('click', closeSettings);
+buttonDisplayPreferences.addEventListener('click', displayPreferences);
+buttonDisplayStatistics.addEventListener('click', displayStatistics);
+buttonEasyDifficulty.addEventListener('click', () => selectDifficulty('easy'));
+buttonMediumDifficulty.addEventListener('click', () => selectDifficulty('medium'));
+buttonHardDifficulty.addEventListener('click', () => selectDifficulty('hard'));
 
 // if (document.readyState === 'loading') {
 //     document.addEventListener('DOMContentLoaded', getWords);
@@ -87,6 +107,69 @@ function keepTrackArrayOfWords() {
     }
 }
 
+function openSettings() {
+    settings.classList.add('display-settings');
+}
+
+function closeSettings() {
+    settings.classList.remove('display-settings');
+    console.log('a')
+}
+
+function displayPreferences() {
+    settingsMenuBackground.classList.remove('statistics-has-background');
+    settingsMenuBackground.classList.add('preferences-has-background');
+    statistics.style.display = 'none';
+    preferences.style.display = 'block'; 
+}
+
+function displayStatistics() {
+    settingsMenuBackground.classList.remove('preferences-has-background');
+    settingsMenuBackground.classList.add('statistics-has-background');
+    preferences.style.display = 'none';
+    statistics.style.display = 'block';
+}
+
+function selectDifficulty(difficulty) {
+    resetButtonsDifficulties();
+    if (difficulty === 'easy') {
+        buttonEasyDifficulty.innerHTML = 'Difficulty selected';
+        // buttonEasyDifficulty.style.backgroundColor = '#ab82b1';
+        // buttonEasyDifficulty.style.backgroundColor = '#9867a0';
+        // buttonEasyDifficulty.style.backgroundColor = '#9884c0';
+        buttonEasyDifficulty.style.backgroundColor = '#6946ad';
+        localStorage.setItem('difficulty', 'easy');
+    } else if (difficulty === 'medium') {
+        buttonMediumDifficulty.innerHTML = 'Difficulty selected';
+        buttonMediumDifficulty.style.backgroundColor = '#6946ad';
+        localStorage.setItem('difficulty', 'medium');
+    } else {
+        buttonHardDifficulty.innerHTML = 'Difficulty selected';
+        buttonHardDifficulty.style.backgroundColor = '#6946ad';
+        localStorage.setItem('difficulty', 'hard');
+    }
+}
+
+function resetButtonsDifficulties() {
+    buttonEasyDifficulty.innerHTML = 'Select easy difficulty';
+    buttonMediumDifficulty.innerHTML = 'Select medium difficulty';
+    buttonHardDifficulty.innerHTML = 'Select hard difficulty';
+    // buttonEasyDifficulty.style.backgroundColor = '#c5a4ca';
+    buttonEasyDifficulty.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+    buttonMediumDifficulty.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+    buttonHardDifficulty.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+}
+
+function loadDifficulty() {
+    console.log($difficulty);
+    if ($difficulty === null) {
+        selectDifficulty('easy');
+    } else {
+        selectDifficulty($difficulty);
+    }
+}
+
+loadDifficulty();
 
 
 
