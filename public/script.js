@@ -4,9 +4,11 @@ const loadingWord = document.querySelector('.loading-word');
 const wordToBeTyped = document.querySelector('.word-to-be-typed');
 const remainingTime = document.querySelector('.remaining-time');
 const currentScore = document.querySelector('.current-score');
+const levelOfDifficulty = document.querySelector('.level-of-difficulty');
 const buttonOpenSettings = document.querySelector('.button-open-settings');
 const buttonCloseSettings = document.querySelector('.button-close-settings');
 const settings = document.querySelector('.settings');
+const settingsHeaderTitle = document.querySelector('.settings-header-title');
 const buttonDisplayPreferences = document.querySelector('.button-display-preferences');
 const buttonDisplayStatistics = document.querySelector('.button-display-statistics');
 const settingsMenuBackground = document.querySelector('.settings-menu-background');
@@ -16,15 +18,18 @@ const buttonEasyDifficulty = document.querySelector('.button-easy-difficulty');
 const buttonMediumDifficulty = document.querySelector('.button-medium-difficulty');
 const buttonHardDifficulty = document.querySelector('.button-hard-difficulty');
 
+const audioCorrectWord = document.querySelector('#audio-correct-word');
+
 let hasGameStarted = false;
 let arrayOfWords = [];
 let standByArray = [];
 let currentWord;
 let score = 0;
-let time = 10;
+let time;
 let countdown;
 
-const $difficulty = localStorage.getItem('difficulty');
+let $difficulty = localStorage.getItem('difficulty');
+let $remainingTime = JSON.parse(localStorage.getItem('remaining-time'));
 
 inputWord.addEventListener('input', startGame);
 inputWord.addEventListener('input', validateTyping);
@@ -32,9 +37,9 @@ buttonOpenSettings.addEventListener('click', openSettings);
 buttonCloseSettings.addEventListener('click', closeSettings);
 buttonDisplayPreferences.addEventListener('click', displayPreferences);
 buttonDisplayStatistics.addEventListener('click', displayStatistics);
-buttonEasyDifficulty.addEventListener('click', () => selectDifficulty('easy'));
-buttonMediumDifficulty.addEventListener('click', () => selectDifficulty('medium'));
-buttonHardDifficulty.addEventListener('click', () => selectDifficulty('hard'));
+buttonEasyDifficulty.addEventListener('click', () => setDifficultyAndTime('easy'));
+buttonMediumDifficulty.addEventListener('click', () => setDifficultyAndTime('medium'));
+buttonHardDifficulty.addEventListener('click', () => setDifficultyAndTime('hard'));
 
 // if (document.readyState === 'loading') {
 //     document.addEventListener('DOMContentLoaded', getWords);
@@ -55,8 +60,8 @@ async function getWords(array) {
 
 function displayWord() {
     console.log(arrayOfWords);
-    console.log(`WORD: ${currentWord}`);
     currentWord = arrayOfWords[0];
+    console.log(`WORD: ${currentWord}`);
     loandAndDisplayWord.style.gridTemplateAreas = 'word-to-be-typed';
     loadingWord.style.display = 'none';
     wordToBeTyped.style.display = 'block';
@@ -85,6 +90,8 @@ function validateTyping() {
         inputWord.value = '';
         arrayOfWords.shift();
         updateCurrentScore();
+        playAudioCorrectWord();
+        resetTime();
         keepTrackArrayOfWords();
         displayWord();
     }
@@ -93,6 +100,15 @@ function validateTyping() {
 function updateCurrentScore() {
     score++;
     currentScore.innerHTML = score;
+}
+
+function playAudioCorrectWord() {
+    audioCorrectWord.play();
+    audioCorrectWord.volume = 0.2;
+}
+
+function resetTime() {
+    time = $remainingTime + 1;
 }
 
 function keepTrackArrayOfWords() {
@@ -114,13 +130,20 @@ function openSettings() {
 function closeSettings() {
     settings.classList.remove('display-settings');
     console.log('a')
+    resetGameInfo();
+}
+
+function resetGameInfo() {
+    remainingTime.innerHTML = `${$remainingTime}s`;
+    levelOfDifficulty.innerHTML = $difficulty;
 }
 
 function displayPreferences() {
     settingsMenuBackground.classList.remove('statistics-has-background');
     settingsMenuBackground.classList.add('preferences-has-background');
     statistics.style.display = 'none';
-    preferences.style.display = 'block'; 
+    preferences.style.display = 'block';
+    settingsHeaderTitle.innerHTML = 'Preferences';
 }
 
 function displayStatistics() {
@@ -128,25 +151,26 @@ function displayStatistics() {
     settingsMenuBackground.classList.add('statistics-has-background');
     preferences.style.display = 'none';
     statistics.style.display = 'block';
+    settingsHeaderTitle.innerHTML = 'Statistics';
 }
 
-function selectDifficulty(difficulty) {
+function setDifficultyAndTime(difficulty) {
     resetButtonsDifficulties();
     if (difficulty === 'easy') {
         buttonEasyDifficulty.innerHTML = 'Difficulty selected';
-        // buttonEasyDifficulty.style.backgroundColor = '#ab82b1';
-        // buttonEasyDifficulty.style.backgroundColor = '#9867a0';
-        // buttonEasyDifficulty.style.backgroundColor = '#9884c0';
-        buttonEasyDifficulty.style.backgroundColor = '#6946ad';
-        localStorage.setItem('difficulty', 'easy');
+        buttonEasyDifficulty.style.backgroundColor = '#9884c0';
+        updateDifficulty(difficulty);
+        updateRemainingTime(10);
     } else if (difficulty === 'medium') {
         buttonMediumDifficulty.innerHTML = 'Difficulty selected';
-        buttonMediumDifficulty.style.backgroundColor = '#6946ad';
-        localStorage.setItem('difficulty', 'medium');
+        buttonMediumDifficulty.style.backgroundColor = '#9884c0';
+        updateDifficulty(difficulty);
+        updateRemainingTime(7);
     } else {
         buttonHardDifficulty.innerHTML = 'Difficulty selected';
-        buttonHardDifficulty.style.backgroundColor = '#6946ad';
-        localStorage.setItem('difficulty', 'hard');
+        buttonHardDifficulty.style.backgroundColor = '#9884c0';
+        updateDifficulty(difficulty);
+        updateRemainingTime(4);
     }
 }
 
@@ -154,27 +178,36 @@ function resetButtonsDifficulties() {
     buttonEasyDifficulty.innerHTML = 'Select easy difficulty';
     buttonMediumDifficulty.innerHTML = 'Select medium difficulty';
     buttonHardDifficulty.innerHTML = 'Select hard difficulty';
-    // buttonEasyDifficulty.style.backgroundColor = '#c5a4ca';
     buttonEasyDifficulty.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
     buttonMediumDifficulty.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
     buttonHardDifficulty.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
 }
 
-function loadDifficulty() {
-    console.log($difficulty);
+loadDifficultyAndTime();
+
+function loadDifficultyAndTime() {
     if ($difficulty === null) {
-        selectDifficulty('easy');
+        setDifficultyAndTime('easy');
     } else {
-        selectDifficulty($difficulty);
+        setDifficultyAndTime($difficulty);
     }
+    levelOfDifficulty.innerHTML = $difficulty;
+    remainingTime.innerHTML = `${$remainingTime}s`;
+    time = $remainingTime;
 }
 
-loadDifficulty();
+function updateDifficulty(difficulty) {
+    localStorage.setItem('difficulty', difficulty);
+    $difficulty = localStorage.getItem('difficulty');
+    console.log(`Difficulty: ${$difficulty}`);
+}
 
-
-
-
-
+function updateRemainingTime(remainingTime) {
+    localStorage.setItem('remaining-time', JSON.stringify(remainingTime));
+    $remainingTime = JSON.parse(localStorage.getItem('remaining-time'));
+    time = remainingTime;
+    console.log(`Remaining time: ${$remainingTime}`);
+}
 
 
 

@@ -57,13 +57,14 @@ header h2 {
 
 main {
     width: 90%;
-    border: 4px solid #d6d6d6;
+    border: 2px solid #d6d6d6;
+    box-shadow: 0 0 15px 5px rgba(0, 0, 0, 0.2);
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: #fff;
-    border-radius: 15px;
+    border-radius: 10px;
     padding: 12px;
     color: #292929;
 }
@@ -159,6 +160,12 @@ main {
     font-size: 0.9em;
 }
 
+.level-of-difficulty,
+.current-score,
+.highest-score {
+    color: #4e4e4e;
+}
+
 .main-score {
     margin-top: 10px;
     text-align: center;
@@ -203,7 +210,7 @@ main {
     /* display: flex;
     flex-direction: column;
     justify-content: flex-start; 
-    height: 100vh;*/
+    height: 100vh; */
 
     display: none;
     position: fixed;
@@ -215,10 +222,12 @@ main {
     scrollbar-width: none;
     z-index: 10;
     /* background-image: linear-gradient(to right, #e37b7c, #e0ba77); */
+    /* background-image: linear-gradient(to right, #727272, #634796); */
     /* background-image: linear-gradient(to right, #8777a8, #be6db4); */
     /* background-image: linear-gradient(to right, #726193, #be66b3); */
-    background-image: linear-gradient(to bottom, #726193, #8f7eb4);
-    background-repeat: no-repeat;
+    /* background-image: linear-gradient(to bottom, #726193, #8f7eb4); */
+    /* background-repeat: no-repeat; */
+    background-color: #393e46;
     color: #fff;
 }
 
@@ -237,7 +246,8 @@ main {
 .settings-header-and-menu {
     position: sticky;
     top: 0;
-    background-color: #726193;
+    /* background-color: #726193; */
+    background-color: #393e46;
     margin-bottom: 25px;
 }
 
@@ -265,9 +275,13 @@ main {
     font-size: 1.9em;
     font-weight: 700;
     border: none;
-    padding-left: 12px;
+    /* padding-left: 12px; */
     background-color: transparent;
     color: #fff;
+}
+
+.button-close-settings:hover {
+    background-color: #d33232;
 }
 
 .settings-menu {
@@ -295,6 +309,7 @@ main {
     height: 100%;
     width: 50%;
     background-color: rgba(255, 255, 255, 0.2);
+    /* background-color: #9884c0; */
 }
 
 .preferences-has-background,

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Typing game</title>
+    <link href="#" rel="shortcut icon">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Slackey&display=swap" rel="stylesheet">
     <link href="styles.css" rel="stylesheet">
@@ -26,29 +27,27 @@
                     <div class="loading-word"></div>
                     <p class="word-to-be-typed">cenoura</p>
                 </div>
-                <p class="remaining-time">10s</p>
+                <p class="remaining-time"></p>
             </div>
         </div>
         <div class="main-input">
             <input type="text" class="input-word" >
         </div>
         <div class="main-difficulty">
-            <p>Level of difficulty: <span class="difficulty">easy</span></p>
+            <p>Level of difficulty: <span class="level-of-difficulty"></span></p>
         </div>
         <div class="main-score">
             <p>Score: <span class="current-score">0</span></p>
-            <p>Highest score: <span class="hightest-score">12</span></p>
+            <p>Highest score: <span class="highest-score">12</span></p>
         </div>
     </main>
 
-    <button class="button-open-settings">
-        Settings
-    </button>
+    <button class="button-open-settings">Settings</button>
 
     <div class="settings">
         <div class="settings-header-and-menu">
             <div class="settings-header">
-                <h1>Settings</h1>
+                <h1>Settings – <span class="settings-header-title">Preferences</span></h1>
                 <button class="button-close-settings">&times;</button>
             </div>
             <div class="settings-menu">
@@ -91,6 +90,14 @@
             <h1>oiii</h1>
         </div>
     </div>
+
+    <!-- Sound effects -->
+    <audio id="audio-correct-word">
+        <source src="audio/audio-correct-word.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="audio-highest-score">
+        <source src="audio/audio-highest-score.mp3" type="audio/mpeg">
+    </audio>
 
 </body>
 </html>
