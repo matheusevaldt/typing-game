@@ -1,9 +1,14 @@
 const inputWord = document.querySelector('.input-word');
-const loandAndDisplayWord = document.querySelector('.load-and-display-word');
+const loadAndDisplayWord = document.querySelector('.load-and-display-word');
 const loadingWord = document.querySelector('.loading-word');
 const wordToBeTyped = document.querySelector('.word-to-be-typed');
 const remainingTime = document.querySelector('.remaining-time');
 const currentScore = document.querySelector('.current-score');
+const gameOver = document.querySelector('.game-over');
+const gameOverDifficulty = document.querySelector('.game-over-difficulty');
+const gameOverScore = document.querySelector('.game-over-score');
+const gameOverHighestScore = document.querySelector('.game-over-highest-score');
+const buttonPlayAgain = document.querySelector('.button-play-again');
 const levelOfDifficulty = document.querySelector('.level-of-difficulty');
 const buttonOpenSettings = document.querySelector('.button-open-settings');
 const buttonCloseSettings = document.querySelector('.button-close-settings');
@@ -25,14 +30,16 @@ let arrayOfWords = [];
 let standByArray = [];
 let currentWord;
 let score = 0;
-let time;
+let timer;
 let countdown;
 
 let $difficulty = localStorage.getItem('difficulty');
-let $remainingTime = JSON.parse(localStorage.getItem('remaining-time'));
+let $timer = JSON.parse(localStorage.getItem('timer'));
+let $highestScoreOnEasy = JSON.parse(localStorage.getItem('highest-score-on-easy'));
 
 inputWord.addEventListener('input', startGame);
 inputWord.addEventListener('input', validateTyping);
+buttonPlayAgain.addEventListener('click', playAgain);
 buttonOpenSettings.addEventListener('click', openSettings);
 buttonCloseSettings.addEventListener('click', closeSettings);
 buttonDisplayPreferences.addEventListener('click', displayPreferences);
@@ -41,11 +48,11 @@ buttonEasyDifficulty.addEventListener('click', () => setDifficultyAndTime('easy'
 buttonMediumDifficulty.addEventListener('click', () => setDifficultyAndTime('medium'));
 buttonHardDifficulty.addEventListener('click', () => setDifficultyAndTime('hard'));
 
-// if (document.readyState === 'loading') {
-//     document.addEventListener('DOMContentLoaded', getWords);
-// } else {
-//     getWords(arrayOfWords);
-// }
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', getWords);
+} else {
+    getWords(arrayOfWords);
+}
 
 async function getWords(array) {
     const response = await fetch('/words');
@@ -62,7 +69,7 @@ function displayWord() {
     console.log(arrayOfWords);
     currentWord = arrayOfWords[0];
     console.log(`WORD: ${currentWord}`);
-    loandAndDisplayWord.style.gridTemplateAreas = 'word-to-be-typed';
+    loadAndDisplayWord.style.gridTemplateAreas = 'word-to-be-typed';
     loadingWord.style.display = 'none';
     wordToBeTyped.style.display = 'block';
     wordToBeTyped.innerHTML = currentWord;
@@ -76,12 +83,11 @@ function startGame() {
 }
 
 function startCountdown() {
-    console.log('começou')
-    time--;
-    remainingTime.innerHTML = `${time}s`;
-    if (time === 0) {
+    timer--;
+    remainingTime.innerHTML = `${timer}s`;
+    if (timer === 0) {
         clearInterval(countdown);
-        console.log('TIME HAS RAN OUT');
+        gameIsOver();
     }
 }
 
@@ -108,7 +114,7 @@ function playAudioCorrectWord() {
 }
 
 function resetTime() {
-    time = $remainingTime + 1;
+    timer = $timer + 1;
 }
 
 function keepTrackArrayOfWords() {
@@ -123,6 +129,36 @@ function keepTrackArrayOfWords() {
     }
 }
 
+function gameIsOver() {
+    gameOver.classList.add('display-game-over');
+    gameOverDifficulty.innerHTML = $difficulty;
+    gameOverScore.innerHTML = score;
+    verifyHighestScore();
+}
+
+function playAgain() {
+    gameOver.classList.remove('display-game-over');
+    loadAndDisplayWord.style.gridTemplateAreas = 'loading-word';
+    wordToBeTyped.style.display = 'none';
+    loadingWord.style.display = 'block';
+    inputWord.value = '';
+    remainingTime.innerHTML = `${$timer}s`;
+    score = 0;
+    currentScore.innerHTML = score;
+    timer = $timer;
+    arrayOfWords = [];
+    standByArray = [];
+    getWords(arrayOfWords);
+    inputWord.addEventListener('input', startGame);
+}
+
+function verifyHighestScore() {
+    if ($difficulty === 'easy' && score > $highestScoreOnEasy) {
+        console.log('RECORD!');
+        updateHighestScoreOnEasy(score);
+    }
+}
+
 function openSettings() {
     settings.classList.add('display-settings');
 }
@@ -134,7 +170,7 @@ function closeSettings() {
 }
 
 function resetGameInfo() {
-    remainingTime.innerHTML = `${$remainingTime}s`;
+    remainingTime.innerHTML = `${$timer}s`;
     levelOfDifficulty.innerHTML = $difficulty;
 }
 
@@ -160,17 +196,17 @@ function setDifficultyAndTime(difficulty) {
         buttonEasyDifficulty.innerHTML = 'Difficulty selected';
         buttonEasyDifficulty.style.backgroundColor = '#9884c0';
         updateDifficulty(difficulty);
-        updateRemainingTime(10);
+        updateTimer(10);
     } else if (difficulty === 'medium') {
         buttonMediumDifficulty.innerHTML = 'Difficulty selected';
         buttonMediumDifficulty.style.backgroundColor = '#9884c0';
         updateDifficulty(difficulty);
-        updateRemainingTime(7);
+        updateTimer(7);
     } else {
         buttonHardDifficulty.innerHTML = 'Difficulty selected';
         buttonHardDifficulty.style.backgroundColor = '#9884c0';
         updateDifficulty(difficulty);
-        updateRemainingTime(4);
+        updateTimer(4);
     }
 }
 
@@ -192,8 +228,8 @@ function loadDifficultyAndTime() {
         setDifficultyAndTime($difficulty);
     }
     levelOfDifficulty.innerHTML = $difficulty;
-    remainingTime.innerHTML = `${$remainingTime}s`;
-    time = $remainingTime;
+    remainingTime.innerHTML = `${$timer}s`;
+    timer = $timer;
 }
 
 function updateDifficulty(difficulty) {
@@ -202,13 +238,30 @@ function updateDifficulty(difficulty) {
     console.log(`Difficulty: ${$difficulty}`);
 }
 
-function updateRemainingTime(remainingTime) {
-    localStorage.setItem('remaining-time', JSON.stringify(remainingTime));
-    $remainingTime = JSON.parse(localStorage.getItem('remaining-time'));
-    time = remainingTime;
-    console.log(`Remaining time: ${$remainingTime}`);
+function updateTimer(timer) {
+    localStorage.setItem('timer', JSON.stringify(timer));
+    $timer = JSON.parse(localStorage.getItem('timer'));
+    timer = timer;
+    console.log(`Timer: ${$timer}`);
 }
 
+function loadHighestScores() {
+    // if ($highestScoreOnEasy === null) {
+    //     updateHighestScoreOnEasy(0);
+    // } else {
+    //     updateHighestScoreOnEasy($highestScoreOnEasy);
+    // }
+
+    $highestScoreOnEasy === null ? updateHighestScoreOnEasy(0) : updateHighestScoreOnEasy($highestScoreOnEasy);
+}
+
+loadHighestScores();
+
+function updateHighestScoreOnEasy(score) {
+    localStorage.setItem('highest-score-on-easy', JSON.stringify(score));
+    $highestScoreOnEasy = JSON.parse(localStorage.getItem('highest-score-on-easy'));
+    console.log(`Highest score on easy: ${$highestScoreOnEasy}`);
+}
 
 
 
