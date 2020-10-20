@@ -1,3 +1,4 @@
+const mainContainer = document.getElementsByTagName('main')[0];
 const inputWord = document.querySelector('.input-word');
 const loadAndDisplayWord = document.querySelector('.load-and-display-word');
 const loadingWord = document.querySelector('.loading-word');
@@ -24,6 +25,7 @@ const buttonMediumDifficulty = document.querySelector('.button-medium-difficulty
 const buttonHardDifficulty = document.querySelector('.button-hard-difficulty');
 
 const audioCorrectWord = document.querySelector('#audio-correct-word');
+const audioHighestScore = document.querySelector('#audio-highest-score');
 
 let hasGameStarted = false;
 let arrayOfWords = [];
@@ -36,6 +38,8 @@ let countdown;
 let $difficulty = localStorage.getItem('difficulty');
 let $timer = JSON.parse(localStorage.getItem('timer'));
 let $highestScoreOnEasy = JSON.parse(localStorage.getItem('highest-score-on-easy'));
+let $highestScoreOnMedium = JSON.parse(localStorage.getItem('highest-score-on-medium'));
+let $highestScoreOnHard = JSON.parse(localStorage.getItem('highest-score-on-hard'));
 
 inputWord.addEventListener('input', startGame);
 inputWord.addEventListener('input', validateTyping);
@@ -134,9 +138,11 @@ function gameIsOver() {
     gameOverDifficulty.innerHTML = $difficulty;
     gameOverScore.innerHTML = score;
     verifyHighestScore();
+    mainContainer.style.padding = '30px 12px';
 }
 
 function playAgain() {
+    mainContainer.style.padding = '12px';
     gameOver.classList.remove('display-game-over');
     loadAndDisplayWord.style.gridTemplateAreas = 'loading-word';
     wordToBeTyped.style.display = 'none';
@@ -153,10 +159,45 @@ function playAgain() {
 }
 
 function verifyHighestScore() {
-    if ($difficulty === 'easy' && score > $highestScoreOnEasy) {
-        console.log('RECORD!');
-        updateHighestScoreOnEasy(score);
+    if ($difficulty === 'easy') {
+        console.log('EASY');
+        if (score >= $highestScoreOnEasy) {
+            console.log('EASY RECORD');
+            updateHighestScoreOnEasy(score)
+            gameOverHighestScore.innerHTML = `Congrats! That's your <span>highest score</span> on this difficulty so far. E`;
+            playAudioHighestScore();
+        } else {
+            console.log('EASY NO RECORD');
+            gameOverHighestScore.innerHTML = `Highest score on this difficulty: <span>${$highestScoreOnEasy}</span>. E`;
+        }
+    } else if ($difficulty === 'medium') {
+        console.log('MEDIUM')
+        if (score >= $highestScoreOnMedium) {
+            console.log('MEDIUM RECORD')
+            updateHighestScoreOnMedium(score)
+            gameOverHighestScore.innerHTML = `Congrats! That's your <span>highest score</span> on this difficulty so far. M`;
+            playAudioHighestScore();
+        } else {
+            console.log('MEDIUM NO RECORD')
+            gameOverHighestScore.innerHTML = `Highest score on this difficulty: <span>${$highestScoreOnMedium}</span>. M`;
+        }
+    } else {
+        console.log('HARD')
+        if (score >= $highestScoreOnHard) {
+            console.log('HARD RECORD')
+            updateHighestScoreOnHard(score)
+            gameOverHighestScore.innerHTML = `Congrats! That's your <span>highest score</span> on this difficulty so far. H`;
+            playAudioHighestScore();
+        } else {
+            console.log('HARD NO RECORD')
+            gameOverHighestScore.innerHTML = `Highest score on this difficulty: <span>${$highestScoreOnHard}</span>. H`;
+        }
     }
+}
+
+function playAudioHighestScore() {
+    audioHighestScore.play();
+    audioHighestScore.volume = 0.2;
 }
 
 function openSettings() {
@@ -165,7 +206,6 @@ function openSettings() {
 
 function closeSettings() {
     settings.classList.remove('display-settings');
-    console.log('a')
     resetGameInfo();
 }
 
@@ -238,21 +278,33 @@ function updateDifficulty(difficulty) {
     console.log(`Difficulty: ${$difficulty}`);
 }
 
-function updateTimer(timer) {
-    localStorage.setItem('timer', JSON.stringify(timer));
+function updateTimer(value) {
+    localStorage.setItem('timer', JSON.stringify(value));
     $timer = JSON.parse(localStorage.getItem('timer'));
-    timer = timer;
+    timer = value;
     console.log(`Timer: ${$timer}`);
 }
 
 function loadHighestScores() {
-    // if ($highestScoreOnEasy === null) {
-    //     updateHighestScoreOnEasy(0);
-    // } else {
-    //     updateHighestScoreOnEasy($highestScoreOnEasy);
-    // }
+    // $highestScoreOnEasy === null ? updateHighestScoreOnEasy(0) : updateHighestScoreOnEasy($highestScoreOnEasy);
+    // $highestScoreOnMedium === null ? updateHighestScoreOnMedium(0) : updateHighestScoreOnMedium($highestScoreOnMedium);
+    // $highestScoreOnHard === null ? updateHighestScoreOnHard(0) : updateHighestScoreOnHard($highestScoreOnHard);
 
-    $highestScoreOnEasy === null ? updateHighestScoreOnEasy(0) : updateHighestScoreOnEasy($highestScoreOnEasy);
+    if ($highestScoreOnEasy === null) {
+        updateHighestScoreOnEasy(0);
+    } else {
+        updateHighestScoreOnEasy($highestScoreOnEasy);
+    }
+    if ($highestScoreOnMedium === null) {
+        updateHighestScoreOnMedium(0);
+    } else {
+        updateHighestScoreOnMedium($highestScoreOnMedium);
+    }
+    if ($highestScoreOnHard === null) {
+        updateHighestScoreOnHard(0);
+    } else {
+        updateHighestScoreOnHard($highestScoreOnHard);
+    }
 }
 
 loadHighestScores();
@@ -262,6 +314,20 @@ function updateHighestScoreOnEasy(score) {
     $highestScoreOnEasy = JSON.parse(localStorage.getItem('highest-score-on-easy'));
     console.log(`Highest score on easy: ${$highestScoreOnEasy}`);
 }
+
+function updateHighestScoreOnMedium(score) {
+    localStorage.setItem('highest-score-on-medium', JSON.stringify(score));
+    $highestScoreOnMedium = JSON.parse(localStorage.getItem('highest-score-on-medium'));
+    console.log(`Highest score on medium: ${$highestScoreOnMedium}`);
+}
+
+function updateHighestScoreOnHard(score) {
+    localStorage.setItem('highest-score-on-hard', JSON.stringify(score));
+    $highestScoreOnHard = JSON.parse(localStorage.getItem('highest-score-on-hard'));
+    console.log(`Highest score on hard: ${$highestScoreOnHard}`);
+}
+
+
 
 
 

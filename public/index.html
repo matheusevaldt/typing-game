@@ -11,8 +11,6 @@
     <script src="script.js" defer></script>
 </head>
 <body>
-    <!-- <button class="get-data">get data</button>
-    <input type="text" class="input-words"> -->
 
     <header>
         <h1>TYPING GAME</h1>
@@ -21,7 +19,7 @@
 
     <main>
         <div class="main-header">
-            <h2>Type before the time runs out.</h2>
+            <h2>Type correctly before time runs out.</h2>
             <div class="main-header-info">
                 <div class="load-and-display-word">
                     <div class="loading-word"></div>
@@ -33,21 +31,25 @@
         <div class="main-input">
             <input type="text" class="input-word" >
         </div>
-        <div class="main-difficulty">
-            <p>Level of difficulty: <span class="level-of-difficulty"></span></p>
-        </div>
-        <div class="main-score">
+        <div class="main-footer">
+            <p>Difficulty: <span class="level-of-difficulty"></span></p>
             <p>Score: <span class="current-score">0</span></p>
-            <p>Highest score: <span class="highest-score">to-do</span></p>
         </div>
         <div class="game-over">
-            <h2>Time has run out.</h2>
-            <p>
-                You've played on the <span class="game-over-difficulty">medium</span> difficulty. <br> 
-                Your score was <span class="game-over-score">10</span>.
-            </p>
-            <p class="game-over-highest-score">Congrats! That's your highest score on this difficulty so far.</p>
-            <button class="button-play-again">Play again</button>
+            <div class="game-over-header">
+                <img src="images/timer.png" alt="Timer">
+                <h2>Time has run out</h2>
+            </div>
+            <div class="game-over-main">
+                <p>You've played on the <span class="game-over-difficulty">medium</span> difficulty.</p>
+                <p>Your score was <span class="game-over-score">10</span>.</p>
+                <p class="game-over-highest-score"></p>
+                <!-- <p class="game-over-highest-score">Congrats! That's your <span>highest score</span> on this difficulty so far.</p> -->
+                <!-- <p class="game-over-highest-score">Highest score on this difficulty: <span>242</span>.</p> -->
+            </div>
+            <div class="game-over-footer">
+                <button class="button-play-again">Play again</button>
+            </div>
         </div>
     </main>
 
