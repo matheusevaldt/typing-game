@@ -10,15 +10,16 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static('public'));
 
-app.get('/words', async (request, response) => {
+app.post('/words', async (request, response) => {
     try {
-        // console.log(request); // colocar opção pra mudar o máximo de caracteres da palavra - max length
-        const wordnikURL = `https://api.wordnik.com/v4/words.json/randomWords?hasDictionaryDef=true&minLength=4&maxLength=14&limit=10&api_key=${WORDNIK_API_KEY}`;
+        const wordnikURL = `https://api.wordnik.com/v4/words.json/randomWords?hasDictionaryDef=true&excludePartOfSpeech=idiom&minLength=3&maxLength=${request.body.maximumCharacters}&limit=10&api_key=${WORDNIK_API_KEY}`;
         const wordnikResponse = await fetch(wordnikURL);
+        if (!wordnikResponse.ok) throw new Error('Unable to fetch the data from the Wordnik API');
         const wordnikData = await wordnikResponse.json();
         response.json(wordnikData);
     } catch (err) {
-        response.json(`Error: ${err}`);
+        console.log(err.message);
+        response.json(['Error', err.message]);
     }
 });
 

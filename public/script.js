@@ -23,6 +23,8 @@ const statistics = document.querySelector('.statistics');
 const buttonEasyDifficulty = document.querySelector('.button-easy-difficulty');
 const buttonMediumDifficulty = document.querySelector('.button-medium-difficulty');
 const buttonHardDifficulty = document.querySelector('.button-hard-difficulty');
+const errorNotification = document.querySelector('.error-notification');
+const errorDescription = document.querySelector('.error-description');
 
 const audioCorrectWord = document.querySelector('#audio-correct-word');
 const audioHighestScore = document.querySelector('#audio-highest-score');
@@ -40,6 +42,9 @@ let $timer = JSON.parse(localStorage.getItem('timer'));
 let $highestScoreOnEasy = JSON.parse(localStorage.getItem('highest-score-on-easy'));
 let $highestScoreOnMedium = JSON.parse(localStorage.getItem('highest-score-on-medium'));
 let $highestScoreOnHard = JSON.parse(localStorage.getItem('highest-score-on-hard'));
+let $gamesOnEasy = JSON.parse(localStorage.getItem('games-on-easy'));
+let $gamesOnMedium = JSON.parse(localStorage.getItem('games-on-medium'));
+let $gamesOnHard = JSON.parse(localStorage.getItem('games-on-hard'));
 
 inputWord.addEventListener('input', startGame);
 inputWord.addEventListener('input', validateTyping);
@@ -53,20 +58,53 @@ buttonMediumDifficulty.addEventListener('click', () => setDifficultyAndTime('med
 buttonHardDifficulty.addEventListener('click', () => setDifficultyAndTime('hard'));
 
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', getWords);
+    document.addEventListener('DOMContentLoaded', fetchWords);
 } else {
-    getWords(arrayOfWords);
+    fetchWords(arrayOfWords);
 }
 
-async function getWords(array) {
-    const response = await fetch('/words');
-    const words = await response.json();
-    words.map(word => {
-        let rawWord = word.word;
-        let wordAdjusted = rawWord.toLowerCase();
-        array.push(wordAdjusted);
-    });
-    displayWord();
+async function setMaximumCharacters() {
+    if ($difficulty === 'easy') {
+        return 5;
+    } else if ($difficulty === 'medium') {
+        return 9;
+    } else {
+        return 13;
+    }
+}
+
+async function fetchWords(array) {
+    try {
+        inputWord.style.pointerEvents = 'none';
+        const maximumCharacters = await setMaximumCharacters();
+        const options = {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                maximumCharacters: maximumCharacters
+            })
+        };
+        const response = await fetch('/words', options);
+        const words = await response.json();
+        if (words[0] === 'Error') {
+            mainContainer.style.display = 'none';
+            errorNotification.style.display = 'block';
+            errorDescription.innerHTML = 'We were unable to fetch and display the words from the API.';
+        }
+        words.map(word => {
+            let rawWord = word.word;
+            let wordAdjusted = rawWord.toLowerCase();
+            array.push(wordAdjusted);
+        });
+        displayWord();
+        inputWord.style.pointerEvents = 'auto';
+    } catch (err) {
+        console.log('Error in function %cfetchWords', 'background-color: #d7385e; color: #fff;');
+        console.error(err);
+    }
 }
 
 function displayWord() {
@@ -124,7 +162,7 @@ function resetTime() {
 function keepTrackArrayOfWords() {
     if (arrayOfWords.length === 2) {
         console.log('ARRAY PRINCIPAL SÓ TEM MAIS DUAS PALAVRAS');
-        getWords(standByArray);
+        fetchWords(standByArray);
     }
     if (arrayOfWords.length === 0) {
         console.log('ARRAY PRINCIPAL TÁ VAZIO. USER PALAVRAS DO STAND BY ARRAY');
@@ -134,28 +172,12 @@ function keepTrackArrayOfWords() {
 }
 
 function gameIsOver() {
+    mainContainer.style.padding = '30px 12px';
     gameOver.classList.add('display-game-over');
     gameOverDifficulty.innerHTML = $difficulty;
     gameOverScore.innerHTML = score;
     verifyHighestScore();
-    mainContainer.style.padding = '30px 12px';
-}
-
-function playAgain() {
-    mainContainer.style.padding = '12px';
-    gameOver.classList.remove('display-game-over');
-    loadAndDisplayWord.style.gridTemplateAreas = 'loading-word';
-    wordToBeTyped.style.display = 'none';
-    loadingWord.style.display = 'block';
-    inputWord.value = '';
-    remainingTime.innerHTML = `${$timer}s`;
-    score = 0;
-    currentScore.innerHTML = score;
-    timer = $timer;
-    arrayOfWords = [];
-    standByArray = [];
-    getWords(arrayOfWords);
-    inputWord.addEventListener('input', startGame);
+    updateGamesPlayed();
 }
 
 function verifyHighestScore() {
@@ -198,6 +220,33 @@ function verifyHighestScore() {
 function playAudioHighestScore() {
     audioHighestScore.play();
     audioHighestScore.volume = 0.2;
+}
+
+function updateGamesPlayed() {
+    if ($difficulty === 'easy') {
+        updateGamesOnEasy($gamesOnEasy + 1);
+    } else if ($difficulty === 'medium') {
+        updateGamesOnMedium($gamesOnMedium + 1);
+    } else {
+        updateGamesOnHard($gamesOnHard + 1);
+    }
+}
+
+function playAgain() {
+    mainContainer.style.padding = '12px';
+    gameOver.classList.remove('display-game-over');
+    loadAndDisplayWord.style.gridTemplateAreas = 'loading-word';
+    wordToBeTyped.style.display = 'none';
+    loadingWord.style.display = 'block';
+    inputWord.value = '';
+    remainingTime.innerHTML = `${$timer}s`;
+    score = 0;
+    currentScore.innerHTML = score;
+    timer = $timer;
+    arrayOfWords = [];
+    standByArray = [];
+    fetchWords(arrayOfWords);
+    inputWord.addEventListener('input', startGame);
 }
 
 function openSettings() {
@@ -286,25 +335,9 @@ function updateTimer(value) {
 }
 
 function loadHighestScores() {
-    // $highestScoreOnEasy === null ? updateHighestScoreOnEasy(0) : updateHighestScoreOnEasy($highestScoreOnEasy);
-    // $highestScoreOnMedium === null ? updateHighestScoreOnMedium(0) : updateHighestScoreOnMedium($highestScoreOnMedium);
-    // $highestScoreOnHard === null ? updateHighestScoreOnHard(0) : updateHighestScoreOnHard($highestScoreOnHard);
-
-    if ($highestScoreOnEasy === null) {
-        updateHighestScoreOnEasy(0);
-    } else {
-        updateHighestScoreOnEasy($highestScoreOnEasy);
-    }
-    if ($highestScoreOnMedium === null) {
-        updateHighestScoreOnMedium(0);
-    } else {
-        updateHighestScoreOnMedium($highestScoreOnMedium);
-    }
-    if ($highestScoreOnHard === null) {
-        updateHighestScoreOnHard(0);
-    } else {
-        updateHighestScoreOnHard($highestScoreOnHard);
-    }
+    $highestScoreOnEasy === null ? updateHighestScoreOnEasy(0) : updateHighestScoreOnEasy($highestScoreOnEasy);
+    $highestScoreOnMedium === null ? updateHighestScoreOnMedium(0) : updateHighestScoreOnMedium($highestScoreOnMedium);
+    $highestScoreOnHard === null ? updateHighestScoreOnHard(0) : updateHighestScoreOnHard($highestScoreOnHard);
 }
 
 loadHighestScores();
@@ -327,8 +360,31 @@ function updateHighestScoreOnHard(score) {
     console.log(`Highest score on hard: ${$highestScoreOnHard}`);
 }
 
+function loadGamesPlayed() {
+    $gamesOnEasy === null ? updateGamesOnEasy(0) : updateGamesOnEasy($gamesOnEasy);
+    $gamesOnMedium === null ? updateGamesOnMedium (0) : updateGamesOnMedium($gamesOnMedium);
+    $gamesOnHard === null ? updateGamesOnHard(0) : updateGamesOnHard($gamesOnHard);
+}
 
+loadGamesPlayed();
 
+function updateGamesOnEasy(games) {
+    localStorage.setItem('games-on-easy', JSON.stringify(games));
+    $gamesOnEasy = JSON.parse(localStorage.getItem('games-on-easy'));
+    console.log(`Games on easy: ${$gamesOnEasy}`);
+}
+
+function updateGamesOnMedium(games) {
+    localStorage.setItem('games-on-medium', JSON.stringify(games));
+    $gamesOnMedium = JSON.parse(localStorage.getItem('games-on-medium'));
+    console.log(`Games on medium: ${$gamesOnMedium}`);
+}
+
+function updateGamesOnHard(games) {
+    localStorage.setItem('games-on-hard', JSON.stringify(games));
+    $gamesOnHard = JSON.parse(localStorage.getItem('games-on-hard'));
+    console.log(`Games on hard: ${$gamesOnHard}`);
+}
 
 
 
