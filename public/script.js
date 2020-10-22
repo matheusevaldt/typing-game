@@ -23,6 +23,10 @@ const statistics = document.querySelector('.statistics');
 const buttonEasyDifficulty = document.querySelector('.button-easy-difficulty');
 const buttonMediumDifficulty = document.querySelector('.button-medium-difficulty');
 const buttonHardDifficulty = document.querySelector('.button-hard-difficulty');
+const soundEffectsStatus = document.querySelector('.sound-effects-status');
+const soundEffectsOptions = document.querySelector('.sound-effects-options');
+const buttonDisableSoundEffects = document.querySelector('.button-disable-sound-effects');
+const buttonEnableSoundEffects = document.querySelector('.button-enable-sound-effects');
 const errorNotification = document.querySelector('.error-notification');
 const errorDescription = document.querySelector('.error-description');
 
@@ -45,6 +49,7 @@ let $highestScoreOnHard = JSON.parse(localStorage.getItem('highest-score-on-hard
 let $gamesOnEasy = JSON.parse(localStorage.getItem('games-on-easy'));
 let $gamesOnMedium = JSON.parse(localStorage.getItem('games-on-medium'));
 let $gamesOnHard = JSON.parse(localStorage.getItem('games-on-hard'));
+let $soundEffects = localStorage.getItem('sound-effects');
 
 inputWord.addEventListener('input', startGame);
 inputWord.addEventListener('input', validateTyping);
@@ -56,21 +61,13 @@ buttonDisplayStatistics.addEventListener('click', displayStatistics);
 buttonEasyDifficulty.addEventListener('click', () => setDifficultyAndTime('easy'));
 buttonMediumDifficulty.addEventListener('click', () => setDifficultyAndTime('medium'));
 buttonHardDifficulty.addEventListener('click', () => setDifficultyAndTime('hard'));
+buttonDisableSoundEffects.addEventListener('click', disableSoundEffects);
+buttonEnableSoundEffects.addEventListener('click', enableSoundEffects);
 
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', fetchWords);
 } else {
     fetchWords(arrayOfWords);
-}
-
-async function setMaximumCharacters() {
-    if ($difficulty === 'easy') {
-        return 5;
-    } else if ($difficulty === 'medium') {
-        return 9;
-    } else {
-        return 13;
-    }
 }
 
 async function fetchWords(array) {
@@ -93,6 +90,7 @@ async function fetchWords(array) {
             mainContainer.style.display = 'none';
             errorNotification.style.display = 'block';
             errorDescription.innerHTML = 'We were unable to fetch and display the words from the API.';
+            return;
         }
         words.map(word => {
             let rawWord = word.word;
@@ -104,6 +102,16 @@ async function fetchWords(array) {
     } catch (err) {
         console.log('Error in function %cfetchWords', 'background-color: #d7385e; color: #fff;');
         console.error(err);
+    }
+}
+
+async function setMaximumCharacters() {
+    if ($difficulty === 'easy') {
+        return 5;
+    } else if ($difficulty === 'medium') {
+        return 9;
+    } else {
+        return 13;
     }
 }
 
@@ -141,6 +149,7 @@ function validateTyping() {
         playAudioCorrectWord();
         resetTime();
         keepTrackArrayOfWords();
+        motivatePlayer();
         displayWord();
     }
 }
@@ -171,6 +180,22 @@ function keepTrackArrayOfWords() {
     }
 }
 
+function motivatePlayer() {
+    const motivationMessage = document.querySelector('.motivation-message');
+    let rawScore = score.toString();
+    let scoreLastCharacter = rawScore.charAt(rawScore.length - 1);
+    const messages = [
+        'Good job', 'Nice work', 'Excellent', 'Awesome', 'Fantastic', 'Keep it up', 'Impressive', 'Well done', 'Wonderful', 'Outstanding', 'Way to go'
+    ];
+    let randomMessage;
+    if (scoreLastCharacter === '0') {
+        motivationMessage.style.display = 'block';
+        randomMessage = messages[Math.floor(Math.random() * messages.length)];
+        motivationMessage.innerHTML = `<span>&#128079;</span> ${randomMessage}! That's ${score} in a row.`;
+        setTimeout(() => motivationMessage.style.display = 'none', 3500);
+    }
+}
+
 function gameIsOver() {
     mainContainer.style.padding = '30px 12px';
     gameOver.classList.add('display-game-over');
@@ -186,33 +211,33 @@ function verifyHighestScore() {
         if (score >= $highestScoreOnEasy) {
             console.log('EASY RECORD');
             updateHighestScoreOnEasy(score)
-            gameOverHighestScore.innerHTML = `Congrats! That's your <span>highest score</span> on this difficulty so far. E`;
+            gameOverHighestScore.innerHTML = `Congrats! That's your <span>highest score</span> on this difficulty so far.`;
             playAudioHighestScore();
         } else {
             console.log('EASY NO RECORD');
-            gameOverHighestScore.innerHTML = `Highest score on this difficulty: <span>${$highestScoreOnEasy}</span>. E`;
+            gameOverHighestScore.innerHTML = `Highest score on this difficulty: <span>${$highestScoreOnEasy}</span>.`;
         }
     } else if ($difficulty === 'medium') {
         console.log('MEDIUM')
         if (score >= $highestScoreOnMedium) {
             console.log('MEDIUM RECORD')
             updateHighestScoreOnMedium(score)
-            gameOverHighestScore.innerHTML = `Congrats! That's your <span>highest score</span> on this difficulty so far. M`;
+            gameOverHighestScore.innerHTML = `Congrats! That's your <span>highest score</span> on this difficulty so far.`;
             playAudioHighestScore();
         } else {
             console.log('MEDIUM NO RECORD')
-            gameOverHighestScore.innerHTML = `Highest score on this difficulty: <span>${$highestScoreOnMedium}</span>. M`;
+            gameOverHighestScore.innerHTML = `Highest score on this difficulty: <span>${$highestScoreOnMedium}</span>.`;
         }
     } else {
         console.log('HARD')
         if (score >= $highestScoreOnHard) {
             console.log('HARD RECORD')
             updateHighestScoreOnHard(score)
-            gameOverHighestScore.innerHTML = `Congrats! That's your <span>highest score</span> on this difficulty so far. H`;
+            gameOverHighestScore.innerHTML = `Congrats! That's your <span>highest score</span> on this difficulty so far.`;
             playAudioHighestScore();
         } else {
             console.log('HARD NO RECORD')
-            gameOverHighestScore.innerHTML = `Highest score on this difficulty: <span>${$highestScoreOnHard}</span>. H`;
+            gameOverHighestScore.innerHTML = `Highest score on this difficulty: <span>${$highestScoreOnHard}</span>.`;
         }
     }
 }
@@ -251,6 +276,7 @@ function playAgain() {
 
 function openSettings() {
     settings.classList.add('display-settings');
+    adjustSoundEffectsOptions();
 }
 
 function closeSettings() {
@@ -283,29 +309,29 @@ function setDifficultyAndTime(difficulty) {
     resetButtonsDifficulties();
     if (difficulty === 'easy') {
         buttonEasyDifficulty.innerHTML = 'Difficulty selected';
-        buttonEasyDifficulty.style.backgroundColor = '#9884c0';
+        buttonEasyDifficulty.style.backgroundColor = '#e37b7c';
         updateDifficulty(difficulty);
         updateTimer(10);
     } else if (difficulty === 'medium') {
         buttonMediumDifficulty.innerHTML = 'Difficulty selected';
-        buttonMediumDifficulty.style.backgroundColor = '#9884c0';
+        buttonMediumDifficulty.style.backgroundColor = '#e37b7c';
         updateDifficulty(difficulty);
         updateTimer(7);
     } else {
         buttonHardDifficulty.innerHTML = 'Difficulty selected';
-        buttonHardDifficulty.style.backgroundColor = '#9884c0';
+        buttonHardDifficulty.style.backgroundColor = '#e37b7c';
         updateDifficulty(difficulty);
         updateTimer(4);
     }
 }
 
 function resetButtonsDifficulties() {
-    buttonEasyDifficulty.innerHTML = 'Select easy difficulty';
-    buttonMediumDifficulty.innerHTML = 'Select medium difficulty';
-    buttonHardDifficulty.innerHTML = 'Select hard difficulty';
-    buttonEasyDifficulty.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-    buttonMediumDifficulty.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-    buttonHardDifficulty.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+    buttonEasyDifficulty.innerHTML = 'Select difficulty';
+    buttonMediumDifficulty.innerHTML = 'Select difficulty';
+    buttonHardDifficulty.innerHTML = 'Select difficulty';
+    buttonEasyDifficulty.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
+    buttonMediumDifficulty.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
+    buttonHardDifficulty.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
 }
 
 loadDifficultyAndTime();
@@ -386,6 +412,59 @@ function updateGamesOnHard(games) {
     console.log(`Games on hard: ${$gamesOnHard}`);
 }
 
+
+
+
+
+function disableSoundEffects() {
+    audioCorrectWord.muted = true;
+    audioHighestScore.muted = true;
+    soundEffectsStatus.innerHTML = 'Sound effects are currently disabled.';
+    buttonDisableSoundEffects.style.display = 'none';
+    buttonEnableSoundEffects.style.display = 'block';
+    soundEffectsOptions.classList.add('sound-effects-options-enabled');
+    updateSoundEffects('disabled');
+}
+
+function enableSoundEffects() {
+    audioCorrectWord.muted = false;
+    audioHighestScore.muted = false;
+    soundEffectsStatus.innerHTML = 'Sound effects are currently enabled.';
+    buttonEnableSoundEffects.style.display = 'none';
+    buttonDisableSoundEffects.style.display = 'block';
+    soundEffectsOptions.classList.remove('sound-effects-options-enabled');
+    updateSoundEffects('enabled');
+}
+
+function adjustSoundEffectsOptions() {
+    if ($soundEffects === 'enabled' || $soundEffects === null) {
+        soundEffectsStatus.innerHTML = 'Sound effects are currently enabled.';
+        buttonEnableSoundEffects.style.display = 'none';
+        buttonDisableSoundEffects.style.display = 'block';
+        soundEffectsOptions.classList.remove('sound-effects-options-enabled');
+    } else if ($soundEffects === 'disabled') {
+        soundEffectsStatus.innerHTML = 'Sound effects are currently disabled.';
+        buttonDisableSoundEffects.style.display = 'none';
+        buttonEnableSoundEffects.style.display = 'block';
+        soundEffectsOptions.classList.add('sound-effects-options-enabled');
+    }
+}
+
+function updateSoundEffects(status) {
+    localStorage.setItem('sound-effects', status);
+    $soundEffects = localStorage.getItem('sound-effects');
+    console.log(`Sound effects: ${$soundEffects}`);
+}
+
+function loadSoundEffects() {
+    console.log(`Sound effects: ${$soundEffects}`);
+    if ($soundEffects === 'disabled') {
+        audioCorrectWord.muted = true;
+        audioHighestScore.muted = true;
+    }
+}
+
+loadSoundEffects();
 
 
 // const a = document.querySelector('.a');
