@@ -44,8 +44,6 @@
                 <p>You've played on the <span class="game-over-difficulty">medium</span> difficulty.</p>
                 <p>Your score was <span class="game-over-score">10</span>.</p>
                 <p class="game-over-highest-score"></p>
-                <!-- <p class="game-over-highest-score">Congrats! That's your <span>highest score</span> on this difficulty so far.</p> -->
-                <!-- <p class="game-over-highest-score">Highest score on this difficulty: <span>242</span>.</p> -->
             </div>
             <div class="game-over-footer">
                 <button class="button-play-again">Play again</button>
@@ -107,7 +105,58 @@
             </div>
         </div>
         <div class="statistics">
-            <h1>oiii</h1>
+            <div class="games-played-on-each-difficulty">
+                <h2>Games played</h2>
+                <table>
+                    <tr>
+                        <td class="td-difficulty">Easy</td>
+                        <td class="td-statistic" id="games-on-easy"></td>
+                    </tr>
+                    <tr>
+                        <td class="td-difficulty">Medium</td>
+                        <td class="td-statistic" id="games-on-medium"></td>
+                    </tr>
+                    <tr>
+                        <td class="td-difficulty">Hard</td>
+                        <td class="td-statistic" id="games-on-hard"></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="highest-score-on-each-difficulty">
+                <h2>Highest scores</h2>
+                <table>
+                    <tr>
+                        <td class="td-difficulty">Easy</td>
+                        <td class="td-statistic" id="highest-score-on-easy"></td>
+                    </tr>
+                    <tr>
+                        <td class="td-difficulty">Medium</td>
+                        <td class="td-statistic" id="highest-score-on-medium"></td>
+                    </tr>
+                    <tr>
+                        <td class="td-difficulty">Hard</td>
+                        <td class="td-statistic" id="highest-score-on-hard"></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="average-score-on-each-difficulty">
+                <h2>Average scores</h2>
+                <table>
+                    <tr>
+                        <td class="td-difficulty">Easy</td>
+                        <td class="td-statistic" id="average-score-on-easy"></td>
+                    </tr>
+                    <tr>
+                        <td class="td-difficulty">Medium</td>
+                        <td class="td-statistic" id="average-score-on-medium"></td>
+                    </tr>
+                    <tr>
+                        <td class="td-difficulty">Hard</td>
+                        <td class="td-statistic" id="average-score-on-hard"></td>
+                    </tr>
+                </table>
+            </div>
+            <button class="button-clear-statistics">Clear statistics</button>
         </div>
     </div>
 
@@ -117,7 +166,8 @@
         <p class="error-description">We were unable to fetch and display the data from the API.</p>
     </div>
 
-    <div class="motivation-message"><span>&#128079;</span> Nice work! That's 10 in a row.</div>
+    <!-- <div class="motivation-message"><span>&#128079;</span> Nice work! That's 10 in a row.</div> -->
+    <div class="motivation-message"></div>
 
     <!-- Sound effects -->
     <audio id="audio-correct-word">

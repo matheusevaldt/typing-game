@@ -1,4 +1,5 @@
 const mainContainer = document.getElementsByTagName('main')[0];
+const headerContainer = document.getElementsByTagName('header')[0];
 const inputWord = document.querySelector('.input-word');
 const loadAndDisplayWord = document.querySelector('.load-and-display-word');
 const loadingWord = document.querySelector('.loading-word');
@@ -29,6 +30,18 @@ const buttonDisableSoundEffects = document.querySelector('.button-disable-sound-
 const buttonEnableSoundEffects = document.querySelector('.button-enable-sound-effects');
 const errorNotification = document.querySelector('.error-notification');
 const errorDescription = document.querySelector('.error-description');
+const motivationMessage = document.querySelector('.motivation-message');
+const buttonClearStatistics = document.querySelector('.button-clear-statistics');
+
+const gamesOnEasy = document.getElementById('games-on-easy');
+const gamesOnMedium = document.getElementById('games-on-medium');
+const gamesOnHard = document.getElementById('games-on-hard');
+const highestScoreOnEasy = document.getElementById('highest-score-on-easy');
+const highestScoreOnMedium = document.getElementById('highest-score-on-medium');
+const highestScoreOnHard = document.getElementById('highest-score-on-hard');
+const averageScoreOnEasy = document.getElementById('average-score-on-easy');
+const averageScoreOnMedium = document.getElementById('average-score-on-medium');
+const averageScoreOnHard = document.getElementById('average-score-on-hard');
 
 const audioCorrectWord = document.querySelector('#audio-correct-word');
 const audioHighestScore = document.querySelector('#audio-highest-score');
@@ -50,10 +63,16 @@ let $gamesOnEasy = JSON.parse(localStorage.getItem('games-on-easy'));
 let $gamesOnMedium = JSON.parse(localStorage.getItem('games-on-medium'));
 let $gamesOnHard = JSON.parse(localStorage.getItem('games-on-hard'));
 let $soundEffects = localStorage.getItem('sound-effects');
+let $totalScoreOnEasy = JSON.parse(localStorage.getItem('total-score-on-easy'));
+let $totalScoreOnMedium = JSON.parse(localStorage.getItem('total-score-on-medium'));
+let $totalScoreOnHard = JSON.parse(localStorage.getItem('total-score-on-hard'));
+let $averageScoreOnEasy = JSON.parse(localStorage.getItem('average-score-on-easy'));
+let $averageScoreOnMedium = JSON.parse(localStorage.getItem('average-score-on-medium'));
+let $averageScoreOnHard = JSON.parse(localStorage.getItem('average-score-on-hard'));
 
 inputWord.addEventListener('input', startGame);
 inputWord.addEventListener('input', validateTyping);
-buttonPlayAgain.addEventListener('click', playAgain);
+buttonPlayAgain.addEventListener('click', resetGame);
 buttonOpenSettings.addEventListener('click', openSettings);
 buttonCloseSettings.addEventListener('click', closeSettings);
 buttonDisplayPreferences.addEventListener('click', displayPreferences);
@@ -63,6 +82,7 @@ buttonMediumDifficulty.addEventListener('click', () => setDifficultyAndTime('med
 buttonHardDifficulty.addEventListener('click', () => setDifficultyAndTime('hard'));
 buttonDisableSoundEffects.addEventListener('click', disableSoundEffects);
 buttonEnableSoundEffects.addEventListener('click', enableSoundEffects);
+buttonClearStatistics.addEventListener('click', clearStatistics);
 
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', fetchWords);
@@ -160,8 +180,8 @@ function updateCurrentScore() {
 }
 
 function playAudioCorrectWord() {
+    audioCorrectWord.volume = 0.4;
     audioCorrectWord.play();
-    audioCorrectWord.volume = 0.2;
 }
 
 function resetTime() {
@@ -181,7 +201,6 @@ function keepTrackArrayOfWords() {
 }
 
 function motivatePlayer() {
-    const motivationMessage = document.querySelector('.motivation-message');
     let rawScore = score.toString();
     let scoreLastCharacter = rawScore.charAt(rawScore.length - 1);
     const messages = [
@@ -203,6 +222,7 @@ function gameIsOver() {
     gameOverScore.innerHTML = score;
     verifyHighestScore();
     updateGamesPlayed();
+    updateTotalScore();
 }
 
 function verifyHighestScore() {
@@ -243,8 +263,8 @@ function verifyHighestScore() {
 }
 
 function playAudioHighestScore() {
+    audioHighestScore.volume = 0.4;
     audioHighestScore.play();
-    audioHighestScore.volume = 0.2;
 }
 
 function updateGamesPlayed() {
@@ -257,36 +277,46 @@ function updateGamesPlayed() {
     }
 }
 
-function playAgain() {
+function updateTotalScore() {
+    if ($difficulty === 'easy') {
+        let totalScoreOnEasy = $totalScoreOnEasy + score;
+        updateTotalScoreOnEasy(totalScoreOnEasy);
+    } else if ($difficulty === 'medium') {
+        let totalScoreOnMedium = $totalScoreOnMedium + score;
+        updateTotalScoreOnMedium(totalScoreOnMedium);
+    } else {
+        let totalScoreOnHard = $totalScoreOnHard + score;
+        updateTotalScoreOnHard(totalScoreOnHard);
+    }
+}
+
+function openSettings() {
+    settings.classList.add('display-settings');
+    displayPreferences();
+    adjustSoundEffectsOptions();
+}
+
+function closeSettings() {
+    settings.classList.remove('display-settings');
+    resetGame();
+}
+
+function resetGame() {
     mainContainer.style.padding = '12px';
     gameOver.classList.remove('display-game-over');
     loadAndDisplayWord.style.gridTemplateAreas = 'loading-word';
     wordToBeTyped.style.display = 'none';
     loadingWord.style.display = 'block';
     inputWord.value = '';
+    levelOfDifficulty.innerHTML = $difficulty;
     remainingTime.innerHTML = `${$timer}s`;
+    timer = $timer;
     score = 0;
     currentScore.innerHTML = score;
-    timer = $timer;
     arrayOfWords = [];
     standByArray = [];
     fetchWords(arrayOfWords);
     inputWord.addEventListener('input', startGame);
-}
-
-function openSettings() {
-    settings.classList.add('display-settings');
-    adjustSoundEffectsOptions();
-}
-
-function closeSettings() {
-    settings.classList.remove('display-settings');
-    resetGameInfo();
-}
-
-function resetGameInfo() {
-    remainingTime.innerHTML = `${$timer}s`;
-    levelOfDifficulty.innerHTML = $difficulty;
 }
 
 function displayPreferences() {
@@ -303,6 +333,7 @@ function displayStatistics() {
     preferences.style.display = 'none';
     statistics.style.display = 'block';
     settingsHeaderTitle.innerHTML = 'Statistics';
+    showStatistcs();
 }
 
 function setDifficultyAndTime(difficulty) {
@@ -412,6 +443,101 @@ function updateGamesOnHard(games) {
     console.log(`Games on hard: ${$gamesOnHard}`);
 }
 
+function loadTotalScore() {
+    $totalScoreOnEasy === null ? updateTotalScoreOnEasy(0) : updateTotalScoreOnMedium($totalScoreOnEasy);
+    $totalScoreOnMedium === null ? updateTotalScoreOnMedium(0) : updateTotalScoreOnMedium($totalScoreOnMedium);
+    $totalScoreOnHard === null ? updateTotalScoreOnHard(0) : updateTotalScoreOnHard($totalScoreOnHard);
+}
+
+loadTotalScore();
+
+function updateTotalScoreOnEasy(totalScore) {
+    localStorage.setItem('total-score-on-easy', JSON.stringify(totalScore));
+    $totalScoreOnEasy = JSON.parse(localStorage.getItem('total-score-on-easy'));
+    console.log(`Total score on easy: ${$totalScoreOnEasy}`);
+}
+
+function updateTotalScoreOnMedium(totalScore) {
+    localStorage.setItem('total-score-on-medium', JSON.stringify(totalScore));
+    $totalScoreOnMedium = JSON.parse(localStorage.getItem('total-score-on-medium'));
+    console.log(`Total score on medium: ${$totalScoreOnMedium}`);
+}
+
+function updateTotalScoreOnHard(totalScore) {
+    localStorage.setItem('total-score-on-hard', JSON.stringify(totalScore));
+    $totalScoreOnHard = JSON.parse(localStorage.getItem('total-score-on-hard'));
+    console.log(`Total score on hard: ${$totalScoreOnHard}`);
+}
+
+function loadAverageScore() {
+    $averageScoreOnEasy === null ? updateAverageScoreOnEasy(0) : updateAverageScoreOnEasy($averageScoreOnEasy);
+    $averageScoreOnMedium === null ? updateAverageScoreOnMedium(0) : updateAverageScoreOnMedium($averageScoreOnMedium);
+    $averageScoreOnHard === null ? updateAverageScoreOnHard(0) : updateAverageScoreOnHard($averageScoreOnHard);
+}
+
+loadAverageScore();
+
+function updateAverageScoreOnEasy(averageScore) {
+    localStorage.setItem('average-score-on-easy', JSON.stringify(averageScore));
+    $averageScoreOnEasy = JSON.parse(localStorage.getItem('average-score-on-easy'));
+    console.log(`Average score on easy: ${$averageScoreOnEasy}`);
+}
+
+function updateAverageScoreOnMedium(averageScore) {
+    localStorage.setItem('average-score-on-medium', JSON.stringify(averageScore));
+    $averageScoreOnMedium = JSON.parse(localStorage.getItem('average-score-on-medium'));
+    console.log(`Average score on medium: ${$averageScoreOnMedium}`);
+}
+
+function updateAverageScoreOnHard(averageScore) {
+    localStorage.setItem('average-score-on-hard', JSON.stringify(averageScore));
+    $averageScoreOnHard = JSON.parse(localStorage.getItem('average-score-on-hard'));
+    console.log(`Average score on hard: ${$averageScoreOnHard}`);
+}
+
+function showStatistcs() {
+    gamesOnEasy.innerHTML = $gamesOnEasy;
+    gamesOnMedium.innerHTML = $gamesOnMedium;
+    gamesOnHard.innerHTML = $gamesOnHard;
+    highestScoreOnEasy.innerHTML = $highestScoreOnEasy;
+    highestScoreOnMedium.innerHTML = $highestScoreOnMedium;
+    highestScoreOnHard.innerHTML = $highestScoreOnHard;
+    showAverageScores();
+}
+
+function showAverageScores() {
+    let scoreOnEasy;
+    let scoreOnMedium;
+    let scoreOnHard;
+    scoreOnEasy = ($totalScoreOnEasy / $gamesOnEasy).toFixed(1);
+    scoreOnMedium = ($totalScoreOnMedium / $gamesOnMedium).toFixed(1);
+    scoreOnHard = ($totalScoreOnHard / $gamesOnHard).toFixed(1);
+    if (!isFinite(scoreOnEasy)) scoreOnEasy = 0;
+    if (!isFinite(scoreOnMedium)) scoreOnMedium = 0;
+    if (!isFinite(scoreOnHard)) scoreOnHard = 0;
+    updateAverageScoreOnEasy(scoreOnEasy);
+    updateAverageScoreOnMedium(scoreOnMedium);
+    updateAverageScoreOnHard(scoreOnHard);
+    averageScoreOnEasy.innerHTML = scoreOnEasy;
+    averageScoreOnMedium.innerHTML = scoreOnMedium;
+    averageScoreOnHard.innerHTML = scoreOnHard;
+}
+
+function clearStatistics() {
+    updateGamesOnEasy(0);
+    updateGamesOnMedium(0);
+    updateGamesOnHard(0);
+    updateHighestScoreOnEasy(0);
+    updateHighestScoreOnMedium(0);
+    updateHighestScoreOnHard(0);
+    updateTotalScoreOnEasy(0);
+    updateTotalScoreOnMedium(0);
+    updateTotalScoreOnHard(0);
+    updateAverageScoreOnEasy(0);
+    updateAverageScoreOnMedium(0);
+    updateAverageScoreOnHard(0);
+    showStatistcs();
+}
 
 
 
@@ -436,6 +562,12 @@ function enableSoundEffects() {
     updateSoundEffects('enabled');
 }
 
+function updateSoundEffects(status) {
+    localStorage.setItem('sound-effects', status);
+    $soundEffects = localStorage.getItem('sound-effects');
+    console.log(`Sound effects: ${$soundEffects}`);
+}
+
 function adjustSoundEffectsOptions() {
     if ($soundEffects === 'enabled' || $soundEffects === null) {
         soundEffectsStatus.innerHTML = 'Sound effects are currently enabled.';
@@ -450,12 +582,6 @@ function adjustSoundEffectsOptions() {
     }
 }
 
-function updateSoundEffects(status) {
-    localStorage.setItem('sound-effects', status);
-    $soundEffects = localStorage.getItem('sound-effects');
-    console.log(`Sound effects: ${$soundEffects}`);
-}
-
 function loadSoundEffects() {
     console.log(`Sound effects: ${$soundEffects}`);
     if ($soundEffects === 'disabled') {
@@ -465,6 +591,22 @@ function loadSoundEffects() {
 }
 
 loadSoundEffects();
+
+window.addEventListener('click', () => {
+    const isMobileDevice = window.navigator.userAgent.toLowerCase().includes("mobi");
+    const elementOnFocus = document.activeElement;
+    if (isMobileDevice) {
+        if (elementOnFocus === inputWord) {
+            headerContainer.style.display = 'none';
+            motivationMessage.style.top = '20px';
+            buttonOpenSettings.style.bottom = '22px';
+        } else {
+            headerContainer.style.display = 'block';
+            motivationMessage.style.top = '26%';
+            buttonOpenSettings.style.bottom = '30px';
+        }
+    }
+});
 
 
 // const a = document.querySelector('.a');
