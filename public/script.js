@@ -1,3 +1,4 @@
+// Global variables.
 const mainContainer = document.getElementsByTagName('main')[0];
 const headerContainer = document.getElementsByTagName('header')[0];
 const inputWord = document.querySelector('.input-word');
@@ -32,7 +33,6 @@ const errorNotification = document.querySelector('.error-notification');
 const errorDescription = document.querySelector('.error-description');
 const motivationMessage = document.querySelector('.motivation-message');
 const buttonClearStatistics = document.querySelector('.button-clear-statistics');
-
 const gamesOnEasy = document.getElementById('games-on-easy');
 const gamesOnMedium = document.getElementById('games-on-medium');
 const gamesOnHard = document.getElementById('games-on-hard');
@@ -42,18 +42,15 @@ const highestScoreOnHard = document.getElementById('highest-score-on-hard');
 const averageScoreOnEasy = document.getElementById('average-score-on-easy');
 const averageScoreOnMedium = document.getElementById('average-score-on-medium');
 const averageScoreOnHard = document.getElementById('average-score-on-hard');
-
 const audioCorrectWord = document.querySelector('#audio-correct-word');
 const audioHighestScore = document.querySelector('#audio-highest-score');
-
-let hasGameStarted = false;
 let arrayOfWords = [];
 let standByArray = [];
 let currentWord;
 let score = 0;
 let timer;
 let countdown;
-
+// Local storage variables.
 let $difficulty = localStorage.getItem('difficulty');
 let $timer = JSON.parse(localStorage.getItem('timer'));
 let $highestScoreOnEasy = JSON.parse(localStorage.getItem('highest-score-on-easy'));
@@ -70,6 +67,13 @@ let $averageScoreOnEasy = JSON.parse(localStorage.getItem('average-score-on-easy
 let $averageScoreOnMedium = JSON.parse(localStorage.getItem('average-score-on-medium'));
 let $averageScoreOnHard = JSON.parse(localStorage.getItem('average-score-on-hard'));
 
+// if ($difficulty === null) {
+//     setDifficultyAndTime('easy');
+// } else {
+//     setDifficultyAndTime($difficulty);
+// }
+
+// Event listeners.
 inputWord.addEventListener('input', startGame);
 inputWord.addEventListener('input', validateTyping);
 buttonPlayAgain.addEventListener('click', resetGame);
@@ -84,12 +88,58 @@ buttonDisableSoundEffects.addEventListener('click', disableSoundEffects);
 buttonEnableSoundEffects.addEventListener('click', enableSoundEffects);
 buttonClearStatistics.addEventListener('click', clearStatistics);
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', fetchWords);
-} else {
-    fetchWords(arrayOfWords);
+// Functions to be executed before user interacts with the application.
+(function () {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadDifficultyAndTime);
+        document.addEventListener('DOMContentLoaded', fetchWords);
+        document.addEventListener('DOMContentLoaded', loadHighestScores);
+        document.addEventListener('DOMContentLoaded', loadGamesPlayed);
+        document.addEventListener('DOMContentLoaded', loadTotalScore);
+        document.addEventListener('DOMContentLoaded', loadAverageScore);
+    } else {
+        loadDifficultyAndTime();
+        fetchWords(arrayOfWords);
+        loadHighestScores();
+        loadGamesPlayed();
+        loadTotalScore();
+        loadAverageScore();
+    }
+})();
+
+function loadDifficultyAndTime() {
+    $difficulty === null ? setDifficultyAndTime('easy') : setDifficultyAndTime($difficulty);
+    levelOfDifficulty.innerHTML = $difficulty;
+    remainingTime.innerHTML = `${$timer}s`;
+    timer = $timer;
 }
 
+function loadHighestScores() {
+    $highestScoreOnEasy === null ? updateHighestScoreOnEasy(0) : updateHighestScoreOnEasy($highestScoreOnEasy);
+    $highestScoreOnMedium === null ? updateHighestScoreOnMedium(0) : updateHighestScoreOnMedium($highestScoreOnMedium);
+    $highestScoreOnHard === null ? updateHighestScoreOnHard(0) : updateHighestScoreOnHard($highestScoreOnHard);
+}
+
+function loadGamesPlayed() {
+    $gamesOnEasy === null ? updateGamesOnEasy(0) : updateGamesOnEasy($gamesOnEasy);
+    $gamesOnMedium === null ? updateGamesOnMedium (0) : updateGamesOnMedium($gamesOnMedium);
+    $gamesOnHard === null ? updateGamesOnHard(0) : updateGamesOnHard($gamesOnHard);
+}
+
+function loadTotalScore() {
+    $totalScoreOnEasy === null ? updateTotalScoreOnEasy(0) : updateTotalScoreOnEasy($totalScoreOnEasy);
+    $totalScoreOnMedium === null ? updateTotalScoreOnMedium(0) : updateTotalScoreOnMedium($totalScoreOnMedium);
+    $totalScoreOnHard === null ? updateTotalScoreOnHard(0) : updateTotalScoreOnHard($totalScoreOnHard);
+}
+
+function loadAverageScore() {
+    $averageScoreOnEasy === null ? updateAverageScoreOnEasy(0) : updateAverageScoreOnEasy($averageScoreOnEasy);
+    $averageScoreOnMedium === null ? updateAverageScoreOnMedium(0) : updateAverageScoreOnMedium($averageScoreOnMedium);
+    $averageScoreOnHard === null ? updateAverageScoreOnHard(0) : updateAverageScoreOnHard($averageScoreOnHard);
+}
+
+// Fetching words based on the difficulty.
+// Words are stored in an array.
 async function fetchWords(array) {
     try {
         inputWord.style.pointerEvents = 'none';
@@ -118,6 +168,7 @@ async function fetchWords(array) {
             array.push(wordAdjusted);
         });
         displayWord();
+        updateWord();
         inputWord.style.pointerEvents = 'auto';
     } catch (err) {
         console.log('Error in function %cfetchWords', 'background-color: #d7385e; color: #fff;');
@@ -125,6 +176,7 @@ async function fetchWords(array) {
     }
 }
 
+// Set the maximum amount of characters the words can have based on the difficulty.
 async function setMaximumCharacters() {
     if ($difficulty === 'easy') {
         return 5;
@@ -135,16 +187,22 @@ async function setMaximumCharacters() {
     }
 }
 
+// Remove the loading spinner.
 function displayWord() {
-    console.log(arrayOfWords);
-    currentWord = arrayOfWords[0];
-    console.log(`WORD: ${currentWord}`);
     loadAndDisplayWord.style.gridTemplateAreas = 'word-to-be-typed';
     loadingWord.style.display = 'none';
     wordToBeTyped.style.display = 'block';
+}
+
+// Display the current word that has to be typed.
+function updateWord() {
+    currentWord = arrayOfWords[0];
+    console.log(arrayOfWords);
+    console.log(`WORD: ${currentWord}`);
     wordToBeTyped.innerHTML = currentWord;
 }
 
+// Game starts whenever the user types anything after the word has been displayed.
 function startGame() {
     if (inputWord.length !== 0) {
         countdown = setInterval(startCountdown, 1000);
@@ -152,6 +210,7 @@ function startGame() {
     }
 }
 
+// Countdown starts when game starts.
 function startCountdown() {
     timer--;
     remainingTime.innerHTML = `${timer}s`;
@@ -161,16 +220,22 @@ function startCountdown() {
     }
 }
 
+// Whenever user types a word correctly:
+// - Display new word;
+// - Update score;
+// - Reset countdown;
+// - Play audio if user hasn't disabled it;
+// - Check for the amount of remaining words in the array.
 function validateTyping() {
     if (inputWord.value === currentWord) {
         inputWord.value = '';
         arrayOfWords.shift();
+        updateWord();
         updateCurrentScore();
+        resetCountdown();
         playAudioCorrectWord();
-        resetTime();
         keepTrackArrayOfWords();
         motivatePlayer();
-        displayWord();
     }
 }
 
@@ -179,27 +244,30 @@ function updateCurrentScore() {
     currentScore.innerHTML = score;
 }
 
-function playAudioCorrectWord() {
-    audioCorrectWord.volume = 0.4;
-    audioCorrectWord.play();
-}
-
-function resetTime() {
+function resetCountdown() {
     timer = $timer + 1;
 }
 
+function playAudioCorrectWord() {
+    if ($soundEffects !== 'disabled') {
+        audioCorrectWord.volume = 0.4;
+        audioCorrectWord.play();
+    }
+}
+
+// When there are only two words left in the 'arrayOfWords', fetch new words and store them in the 'standByArray'.
+// When there are no more words left in the 'arrayOfWords', put the newly fetched words in the 'arrayOfWords' and clear the 'standByArray'.
 function keepTrackArrayOfWords() {
     if (arrayOfWords.length === 2) {
-        console.log('ARRAY PRINCIPAL SÓ TEM MAIS DUAS PALAVRAS');
         fetchWords(standByArray);
     }
     if (arrayOfWords.length === 0) {
-        console.log('ARRAY PRINCIPAL TÁ VAZIO. USER PALAVRAS DO STAND BY ARRAY');
         arrayOfWords = standByArray;
         standByArray = [];
     }
 }
 
+// Display a random motivation message whenever the user reaches a score that ends with zero, such as: 10, 20, 30 and so on.
 function motivatePlayer() {
     let rawScore = score.toString();
     let scoreLastCharacter = rawScore.charAt(rawScore.length - 1);
@@ -215,6 +283,9 @@ function motivatePlayer() {
     }
 }
 
+// When the countdown reaches zero, display information about the game that has just ended.
+// Update the amount of games played in the current difficulty.
+// Update the amount of correctly typed words in the current difficulty.
 function gameIsOver() {
     mainContainer.style.padding = '30px 12px';
     gameOver.classList.add('display-game-over');
@@ -225,46 +296,41 @@ function gameIsOver() {
     updateTotalScore();
 }
 
+// Verify if the score of the last game was the highest in that difficulty.
+// Store the new highest score in the localStorage if it is a new record.
 function verifyHighestScore() {
     if ($difficulty === 'easy') {
-        console.log('EASY');
         if (score >= $highestScoreOnEasy) {
-            console.log('EASY RECORD');
             updateHighestScoreOnEasy(score)
-            gameOverHighestScore.innerHTML = `Congrats! That's your <span>highest score</span> on this difficulty so far.`;
+            gameOverHighestScore.innerHTML = `Congrats! That's your highest score on this difficulty.`;
             playAudioHighestScore();
         } else {
-            console.log('EASY NO RECORD');
             gameOverHighestScore.innerHTML = `Highest score on this difficulty: <span>${$highestScoreOnEasy}</span>.`;
         }
     } else if ($difficulty === 'medium') {
-        console.log('MEDIUM')
         if (score >= $highestScoreOnMedium) {
-            console.log('MEDIUM RECORD')
             updateHighestScoreOnMedium(score)
-            gameOverHighestScore.innerHTML = `Congrats! That's your <span>highest score</span> on this difficulty so far.`;
+            gameOverHighestScore.innerHTML = `Congrats! That's your highest score on this difficulty.`;
             playAudioHighestScore();
         } else {
-            console.log('MEDIUM NO RECORD')
             gameOverHighestScore.innerHTML = `Highest score on this difficulty: <span>${$highestScoreOnMedium}</span>.`;
         }
     } else {
-        console.log('HARD')
         if (score >= $highestScoreOnHard) {
-            console.log('HARD RECORD')
             updateHighestScoreOnHard(score)
-            gameOverHighestScore.innerHTML = `Congrats! That's your <span>highest score</span> on this difficulty so far.`;
+            gameOverHighestScore.innerHTML = `Congrats! That's your highest score on this difficulty.`;
             playAudioHighestScore();
         } else {
-            console.log('HARD NO RECORD')
             gameOverHighestScore.innerHTML = `Highest score on this difficulty: <span>${$highestScoreOnHard}</span>.`;
         }
     }
 }
 
 function playAudioHighestScore() {
-    audioHighestScore.volume = 0.4;
-    audioHighestScore.play();
+    if ($soundEffects !== 'disabled') {
+        audioHighestScore.volume = 0.4;
+        audioHighestScore.play();
+    }
 }
 
 function updateGamesPlayed() {
@@ -290,17 +356,7 @@ function updateTotalScore() {
     }
 }
 
-function openSettings() {
-    settings.classList.add('display-settings');
-    displayPreferences();
-    adjustSoundEffectsOptions();
-}
-
-function closeSettings() {
-    settings.classList.remove('display-settings');
-    resetGame();
-}
-
+// When user clicks in the 'Play again' button or leaves the settings container, a new game will be displayed.
 function resetGame() {
     mainContainer.style.padding = '12px';
     gameOver.classList.remove('display-game-over');
@@ -317,6 +373,17 @@ function resetGame() {
     standByArray = [];
     fetchWords(arrayOfWords);
     inputWord.addEventListener('input', startGame);
+}
+
+function openSettings() {
+    settings.classList.add('display-settings');
+    displayPreferences();
+    adjustSoundEffectsOptions();
+}
+
+function closeSettings() {
+    settings.classList.remove('display-settings');
+    resetGame();
 }
 
 function displayPreferences() {
@@ -365,18 +432,9 @@ function resetButtonsDifficulties() {
     buttonHardDifficulty.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
 }
 
-loadDifficultyAndTime();
 
-function loadDifficultyAndTime() {
-    if ($difficulty === null) {
-        setDifficultyAndTime('easy');
-    } else {
-        setDifficultyAndTime($difficulty);
-    }
-    levelOfDifficulty.innerHTML = $difficulty;
-    remainingTime.innerHTML = `${$timer}s`;
-    timer = $timer;
-}
+
+
 
 function updateDifficulty(difficulty) {
     localStorage.setItem('difficulty', difficulty);
@@ -390,14 +448,6 @@ function updateTimer(value) {
     timer = value;
     console.log(`Timer: ${$timer}`);
 }
-
-function loadHighestScores() {
-    $highestScoreOnEasy === null ? updateHighestScoreOnEasy(0) : updateHighestScoreOnEasy($highestScoreOnEasy);
-    $highestScoreOnMedium === null ? updateHighestScoreOnMedium(0) : updateHighestScoreOnMedium($highestScoreOnMedium);
-    $highestScoreOnHard === null ? updateHighestScoreOnHard(0) : updateHighestScoreOnHard($highestScoreOnHard);
-}
-
-loadHighestScores();
 
 function updateHighestScoreOnEasy(score) {
     localStorage.setItem('highest-score-on-easy', JSON.stringify(score));
@@ -417,14 +467,6 @@ function updateHighestScoreOnHard(score) {
     console.log(`Highest score on hard: ${$highestScoreOnHard}`);
 }
 
-function loadGamesPlayed() {
-    $gamesOnEasy === null ? updateGamesOnEasy(0) : updateGamesOnEasy($gamesOnEasy);
-    $gamesOnMedium === null ? updateGamesOnMedium (0) : updateGamesOnMedium($gamesOnMedium);
-    $gamesOnHard === null ? updateGamesOnHard(0) : updateGamesOnHard($gamesOnHard);
-}
-
-loadGamesPlayed();
-
 function updateGamesOnEasy(games) {
     localStorage.setItem('games-on-easy', JSON.stringify(games));
     $gamesOnEasy = JSON.parse(localStorage.getItem('games-on-easy'));
@@ -443,14 +485,6 @@ function updateGamesOnHard(games) {
     console.log(`Games on hard: ${$gamesOnHard}`);
 }
 
-function loadTotalScore() {
-    $totalScoreOnEasy === null ? updateTotalScoreOnEasy(0) : updateTotalScoreOnMedium($totalScoreOnEasy);
-    $totalScoreOnMedium === null ? updateTotalScoreOnMedium(0) : updateTotalScoreOnMedium($totalScoreOnMedium);
-    $totalScoreOnHard === null ? updateTotalScoreOnHard(0) : updateTotalScoreOnHard($totalScoreOnHard);
-}
-
-loadTotalScore();
-
 function updateTotalScoreOnEasy(totalScore) {
     localStorage.setItem('total-score-on-easy', JSON.stringify(totalScore));
     $totalScoreOnEasy = JSON.parse(localStorage.getItem('total-score-on-easy'));
@@ -468,14 +502,6 @@ function updateTotalScoreOnHard(totalScore) {
     $totalScoreOnHard = JSON.parse(localStorage.getItem('total-score-on-hard'));
     console.log(`Total score on hard: ${$totalScoreOnHard}`);
 }
-
-function loadAverageScore() {
-    $averageScoreOnEasy === null ? updateAverageScoreOnEasy(0) : updateAverageScoreOnEasy($averageScoreOnEasy);
-    $averageScoreOnMedium === null ? updateAverageScoreOnMedium(0) : updateAverageScoreOnMedium($averageScoreOnMedium);
-    $averageScoreOnHard === null ? updateAverageScoreOnHard(0) : updateAverageScoreOnHard($averageScoreOnHard);
-}
-
-loadAverageScore();
 
 function updateAverageScoreOnEasy(averageScore) {
     localStorage.setItem('average-score-on-easy', JSON.stringify(averageScore));
@@ -582,15 +608,7 @@ function adjustSoundEffectsOptions() {
     }
 }
 
-function loadSoundEffects() {
-    console.log(`Sound effects: ${$soundEffects}`);
-    if ($soundEffects === 'disabled') {
-        audioCorrectWord.muted = true;
-        audioHighestScore.muted = true;
-    }
-}
 
-loadSoundEffects();
 
 window.addEventListener('click', () => {
     const isMobileDevice = window.navigator.userAgent.toLowerCase().includes("mobi");
