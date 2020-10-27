@@ -1,7 +1,6 @@
 if (process.env.NODE_ENV !== 'production') require('dotenv').config();
 
 const WORDNIK_API_KEY = process.env.WORDNIK_API_KEY;
-
 const express = require('express');
 const app = express();
 const fetch = require('node-fetch');
@@ -18,9 +17,8 @@ app.post('/words', async (request, response) => {
         const wordnikData = await wordnikResponse.json();
         response.json(wordnikData);
     } catch (err) {
-        console.log(err.message);
         response.json(['Error', err.message]);
     }
 });
 
-app.listen(port, () => console.log('Server updated'));
+app.listen(port, () => console.log('Server updated.'));

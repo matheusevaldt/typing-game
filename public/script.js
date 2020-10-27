@@ -67,12 +67,6 @@ let $averageScoreOnEasy = JSON.parse(localStorage.getItem('average-score-on-easy
 let $averageScoreOnMedium = JSON.parse(localStorage.getItem('average-score-on-medium'));
 let $averageScoreOnHard = JSON.parse(localStorage.getItem('average-score-on-hard'));
 
-// if ($difficulty === null) {
-//     setDifficultyAndTime('easy');
-// } else {
-//     setDifficultyAndTime($difficulty);
-// }
-
 // Event listeners.
 inputWord.addEventListener('input', startGame);
 inputWord.addEventListener('input', validateTyping);
@@ -138,8 +132,7 @@ function loadAverageScore() {
     $averageScoreOnHard === null ? updateAverageScoreOnHard(0) : updateAverageScoreOnHard($averageScoreOnHard);
 }
 
-// Fetching words based on the difficulty.
-// Words are stored in an array.
+// Fetching words based on the difficulty. Words are stored in an array.
 async function fetchWords(array) {
     try {
         inputWord.style.pointerEvents = 'none';
@@ -297,13 +290,13 @@ function gameIsOver() {
 }
 
 // Verify if the score of the last game was the highest in that difficulty.
-// Store the new highest score in the localStorage if it is a new record.
+// If the score if the highest so far, store it in the local storage.
 function verifyHighestScore() {
     if ($difficulty === 'easy') {
         if (score >= $highestScoreOnEasy) {
             updateHighestScoreOnEasy(score)
             gameOverHighestScore.innerHTML = `Congrats! That's your highest score on this difficulty.`;
-            playAudioHighestScore();
+            if ($soundEffects !== 'disabled') playAudioHighestScore();
         } else {
             gameOverHighestScore.innerHTML = `Highest score on this difficulty: <span>${$highestScoreOnEasy}</span>.`;
         }
@@ -311,7 +304,7 @@ function verifyHighestScore() {
         if (score >= $highestScoreOnMedium) {
             updateHighestScoreOnMedium(score)
             gameOverHighestScore.innerHTML = `Congrats! That's your highest score on this difficulty.`;
-            playAudioHighestScore();
+            if ($soundEffects !== 'disabled') playAudioHighestScore();
         } else {
             gameOverHighestScore.innerHTML = `Highest score on this difficulty: <span>${$highestScoreOnMedium}</span>.`;
         }
@@ -319,7 +312,7 @@ function verifyHighestScore() {
         if (score >= $highestScoreOnHard) {
             updateHighestScoreOnHard(score)
             gameOverHighestScore.innerHTML = `Congrats! That's your highest score on this difficulty.`;
-            playAudioHighestScore();
+            if ($soundEffects !== 'disabled') playAudioHighestScore();
         } else {
             gameOverHighestScore.innerHTML = `Highest score on this difficulty: <span>${$highestScoreOnHard}</span>.`;
         }
@@ -327,10 +320,8 @@ function verifyHighestScore() {
 }
 
 function playAudioHighestScore() {
-    if ($soundEffects !== 'disabled') {
-        audioHighestScore.volume = 0.4;
-        audioHighestScore.play();
-    }
+    audioHighestScore.volume = 0.4;
+    audioHighestScore.play();
 }
 
 function updateGamesPlayed() {
@@ -356,7 +347,7 @@ function updateTotalScore() {
     }
 }
 
-// When user clicks in the 'Play again' button or leaves the settings container, a new game will be displayed.
+// When user clicks in the 'Play again' button or closes the settings, a new game will be generated and displayed.
 function resetGame() {
     mainContainer.style.padding = '12px';
     gameOver.classList.remove('display-game-over');
@@ -386,6 +377,7 @@ function closeSettings() {
     resetGame();
 }
 
+// Display the 'preferences' section in the menu. Hide the 'statistics' section.
 function displayPreferences() {
     settingsMenuBackground.classList.remove('statistics-has-background');
     settingsMenuBackground.classList.add('preferences-has-background');
@@ -394,6 +386,7 @@ function displayPreferences() {
     settingsHeaderTitle.innerHTML = 'Preferences';
 }
 
+// Display the 'statistics' section in the menu. Hide the 'preferences' section.
 function displayStatistics() {
     settingsMenuBackground.classList.remove('preferences-has-background');
     settingsMenuBackground.classList.add('statistics-has-background');
@@ -403,6 +396,7 @@ function displayStatistics() {
     showStatistcs();
 }
 
+// When the user selects a difficulty, it will be displayed in the DOM and its settings will be stored in the local storage.
 function setDifficultyAndTime(difficulty) {
     resetButtonsDifficulties();
     if (difficulty === 'easy') {
@@ -432,10 +426,6 @@ function resetButtonsDifficulties() {
     buttonHardDifficulty.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
 }
 
-
-
-
-
 function updateDifficulty(difficulty) {
     localStorage.setItem('difficulty', difficulty);
     $difficulty = localStorage.getItem('difficulty');
@@ -445,8 +435,96 @@ function updateDifficulty(difficulty) {
 function updateTimer(value) {
     localStorage.setItem('timer', JSON.stringify(value));
     $timer = JSON.parse(localStorage.getItem('timer'));
-    timer = value;
     console.log(`Timer: ${$timer}`);
+    timer = value;
+}
+
+// Disable sound effects and store it in the local storage.
+function disableSoundEffects() {
+    audioCorrectWord.muted = true;
+    audioHighestScore.muted = true;
+    soundEffectsStatus.innerHTML = 'Sound effects are currently disabled.';
+    buttonDisableSoundEffects.style.display = 'none';
+    buttonEnableSoundEffects.style.display = 'block';
+    soundEffectsOptions.classList.add('sound-effects-options-enabled');
+    updateSoundEffects('disabled');
+}
+
+// Enable sound effects and store it in the local storage.
+function enableSoundEffects() {
+    audioCorrectWord.muted = false;
+    audioHighestScore.muted = false;
+    soundEffectsStatus.innerHTML = 'Sound effects are currently enabled.';
+    buttonEnableSoundEffects.style.display = 'none';
+    buttonDisableSoundEffects.style.display = 'block';
+    soundEffectsOptions.classList.remove('sound-effects-options-enabled');
+    updateSoundEffects('enabled');
+}
+
+function updateSoundEffects(status) {
+    localStorage.setItem('sound-effects', status);
+    $soundEffects = localStorage.getItem('sound-effects');
+    console.log(`Sound effects: ${$soundEffects}`);
+}
+
+// Display the current state of sound effects based on the user preference.
+function adjustSoundEffectsOptions() {
+    if ($soundEffects === 'enabled' || $soundEffects === null) {
+        soundEffectsStatus.innerHTML = 'Sound effects are currently enabled.';
+        buttonEnableSoundEffects.style.display = 'none';
+        buttonDisableSoundEffects.style.display = 'block';
+        soundEffectsOptions.classList.remove('sound-effects-options-enabled');
+    } else if ($soundEffects === 'disabled') {
+        soundEffectsStatus.innerHTML = 'Sound effects are currently disabled.';
+        buttonDisableSoundEffects.style.display = 'none';
+        buttonEnableSoundEffects.style.display = 'block';
+        soundEffectsOptions.classList.add('sound-effects-options-enabled');
+    }
+}
+
+// Display player's statistics.
+function showStatistcs() {
+    gamesOnEasy.innerHTML = $gamesOnEasy;
+    gamesOnMedium.innerHTML = $gamesOnMedium;
+    gamesOnHard.innerHTML = $gamesOnHard;
+    highestScoreOnEasy.innerHTML = $highestScoreOnEasy;
+    highestScoreOnMedium.innerHTML = $highestScoreOnMedium;
+    highestScoreOnHard.innerHTML = $highestScoreOnHard;
+    showAverageScores();
+}
+
+function showAverageScores() {
+    let scoreOnEasy;
+    let scoreOnMedium;
+    let scoreOnHard;
+    scoreOnEasy = ($totalScoreOnEasy / $gamesOnEasy).toFixed(1);
+    scoreOnMedium = ($totalScoreOnMedium / $gamesOnMedium).toFixed(1);
+    scoreOnHard = ($totalScoreOnHard / $gamesOnHard).toFixed(1);
+    if (!isFinite(scoreOnEasy)) scoreOnEasy = 0;
+    if (!isFinite(scoreOnMedium)) scoreOnMedium = 0;
+    if (!isFinite(scoreOnHard)) scoreOnHard = 0;
+    updateAverageScoreOnEasy(scoreOnEasy);
+    updateAverageScoreOnMedium(scoreOnMedium);
+    updateAverageScoreOnHard(scoreOnHard);
+    averageScoreOnEasy.innerHTML = scoreOnEasy;
+    averageScoreOnMedium.innerHTML = scoreOnMedium;
+    averageScoreOnHard.innerHTML = scoreOnHard;
+}
+
+function clearStatistics() {
+    updateGamesOnEasy(0);
+    updateGamesOnMedium(0);
+    updateGamesOnHard(0);
+    updateHighestScoreOnEasy(0);
+    updateHighestScoreOnMedium(0);
+    updateHighestScoreOnHard(0);
+    updateTotalScoreOnEasy(0);
+    updateTotalScoreOnMedium(0);
+    updateTotalScoreOnHard(0);
+    updateAverageScoreOnEasy(0);
+    updateAverageScoreOnMedium(0);
+    updateAverageScoreOnHard(0);
+    showStatistcs();
 }
 
 function updateHighestScoreOnEasy(score) {
@@ -521,95 +599,10 @@ function updateAverageScoreOnHard(averageScore) {
     console.log(`Average score on hard: ${$averageScoreOnHard}`);
 }
 
-function showStatistcs() {
-    gamesOnEasy.innerHTML = $gamesOnEasy;
-    gamesOnMedium.innerHTML = $gamesOnMedium;
-    gamesOnHard.innerHTML = $gamesOnHard;
-    highestScoreOnEasy.innerHTML = $highestScoreOnEasy;
-    highestScoreOnMedium.innerHTML = $highestScoreOnMedium;
-    highestScoreOnHard.innerHTML = $highestScoreOnHard;
-    showAverageScores();
-}
-
-function showAverageScores() {
-    let scoreOnEasy;
-    let scoreOnMedium;
-    let scoreOnHard;
-    scoreOnEasy = ($totalScoreOnEasy / $gamesOnEasy).toFixed(1);
-    scoreOnMedium = ($totalScoreOnMedium / $gamesOnMedium).toFixed(1);
-    scoreOnHard = ($totalScoreOnHard / $gamesOnHard).toFixed(1);
-    if (!isFinite(scoreOnEasy)) scoreOnEasy = 0;
-    if (!isFinite(scoreOnMedium)) scoreOnMedium = 0;
-    if (!isFinite(scoreOnHard)) scoreOnHard = 0;
-    updateAverageScoreOnEasy(scoreOnEasy);
-    updateAverageScoreOnMedium(scoreOnMedium);
-    updateAverageScoreOnHard(scoreOnHard);
-    averageScoreOnEasy.innerHTML = scoreOnEasy;
-    averageScoreOnMedium.innerHTML = scoreOnMedium;
-    averageScoreOnHard.innerHTML = scoreOnHard;
-}
-
-function clearStatistics() {
-    updateGamesOnEasy(0);
-    updateGamesOnMedium(0);
-    updateGamesOnHard(0);
-    updateHighestScoreOnEasy(0);
-    updateHighestScoreOnMedium(0);
-    updateHighestScoreOnHard(0);
-    updateTotalScoreOnEasy(0);
-    updateTotalScoreOnMedium(0);
-    updateTotalScoreOnHard(0);
-    updateAverageScoreOnEasy(0);
-    updateAverageScoreOnMedium(0);
-    updateAverageScoreOnHard(0);
-    showStatistcs();
-}
-
-
-
-
-function disableSoundEffects() {
-    audioCorrectWord.muted = true;
-    audioHighestScore.muted = true;
-    soundEffectsStatus.innerHTML = 'Sound effects are currently disabled.';
-    buttonDisableSoundEffects.style.display = 'none';
-    buttonEnableSoundEffects.style.display = 'block';
-    soundEffectsOptions.classList.add('sound-effects-options-enabled');
-    updateSoundEffects('disabled');
-}
-
-function enableSoundEffects() {
-    audioCorrectWord.muted = false;
-    audioHighestScore.muted = false;
-    soundEffectsStatus.innerHTML = 'Sound effects are currently enabled.';
-    buttonEnableSoundEffects.style.display = 'none';
-    buttonDisableSoundEffects.style.display = 'block';
-    soundEffectsOptions.classList.remove('sound-effects-options-enabled');
-    updateSoundEffects('enabled');
-}
-
-function updateSoundEffects(status) {
-    localStorage.setItem('sound-effects', status);
-    $soundEffects = localStorage.getItem('sound-effects');
-    console.log(`Sound effects: ${$soundEffects}`);
-}
-
-function adjustSoundEffectsOptions() {
-    if ($soundEffects === 'enabled' || $soundEffects === null) {
-        soundEffectsStatus.innerHTML = 'Sound effects are currently enabled.';
-        buttonEnableSoundEffects.style.display = 'none';
-        buttonDisableSoundEffects.style.display = 'block';
-        soundEffectsOptions.classList.remove('sound-effects-options-enabled');
-    } else if ($soundEffects === 'disabled') {
-        soundEffectsStatus.innerHTML = 'Sound effects are currently disabled.';
-        buttonDisableSoundEffects.style.display = 'none';
-        buttonEnableSoundEffects.style.display = 'block';
-        soundEffectsOptions.classList.add('sound-effects-options-enabled');
-    }
-}
-
-
-
+// If user is using a mobile device and is focusing the 'inputWord':
+// - Hide the header;
+// - Adjust the positioning of the motivation message;
+// - Adjust the positioning of the settings button.
 window.addEventListener('click', () => {
     const isMobileDevice = window.navigator.userAgent.toLowerCase().includes("mobi");
     const elementOnFocus = document.activeElement;
@@ -625,6 +618,17 @@ window.addEventListener('click', () => {
         }
     }
 });
+
+
+
+
+
+
+
+
+
+
+
 
 
 // const a = document.querySelector('.a');

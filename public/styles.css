@@ -19,6 +19,13 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+:root {
+    --main-color: #e37b7c;
+    --black-text-color: #292929;
+    --white-color: #ffffff;
+    --black-small-opacity: rgba(0, 0, 0, 0.2);
+}
+
 button {
     cursor: pointer;
 }
@@ -30,7 +37,7 @@ input {
 
 body {
     font-family: 'Montserrat', sans-serif;
-    background-image: linear-gradient(45deg, #726193 20%, #e37b7c 60%, #ffe4b4);
+    background-image: linear-gradient(45deg, #726193 20%, var(--main-color) 60%, #ffe4b4);
     background-repeat: no-repeat;
     height: 100vh;
     min-height: 100vh;
@@ -39,7 +46,7 @@ body {
 
 header {
     text-align: center;
-    color: #fff;
+    color: var(--white-color);
     padding-top: 25px;
 }
 
@@ -47,31 +54,33 @@ header h1 {
     font-size: 1.5em;
     margin-bottom: 5px;
     font-family: 'Slackey', cursive;
+    text-shadow: 0px 5px var(--black-small-opacity);
 }
 
 header h2 {
     font-size: 0.9em;
     font-weight: 400;
+    text-shadow: 1px 1px var(--black-small-opacity);
 }
 
 main {
     width: 90%;
     border: 3px solid #d6d6d6;
-    box-shadow: 0 0 15px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 15px 5px var(--black-small-opacity);
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: #fff;
+    background-color: var(--white-color);
     border-radius: 10px;
     padding: 12px;
-    color: #292929;
+    color: var(--black-text-color);
 }
 
 .main-header {
     text-align: center;
     padding: 0px 0 7px 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid var(--black-small-opacity);
 }
 
 .main-header h2 {
@@ -94,7 +103,7 @@ main {
 .loading-word {
     grid-area: loading-word;
     border: 3px solid #dfdfdf;
-    border-top: 3px solid #e37b7c;
+    border-top: 3px solid var(--main-color);
     border-radius: 50%;
     width: 18px;
     height: 18px;
@@ -117,7 +126,7 @@ main {
 
 @keyframes glowing-word {
     0% { color: rgba(114, 97, 147, 0.9) } 
-    50% { color: #e37b7c }
+    50% { color: var(--main-color) }
     100% { color: rgba(114, 97, 147, 0.9) }
 } 
 
@@ -127,18 +136,17 @@ main {
 }
 
 .main-input {
-    position: relative;
     margin: 15px 0;
     text-align: center;
     padding-bottom: 15px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid var(--black-small-opacity);
 }
 
 .input-word {
     width: 90%;
     background-color: #eeeeee;
     border: 1px solid #e2e2e2;
-    color: #292929;
+    color: var(--black-text-color);
     font-weight: 700;
     border-radius: 5px;
     padding: 8px 10px;
@@ -148,35 +156,33 @@ main {
 }
 
 .input-word:focus {
-    background-color: #ffffff;
+    background-color: var(--white-color);
 }
 
 .main-footer {
     display: flex;
     justify-content: space-between;
-    font-size: 0.9em;
-    color: #e37b7c;
+    font-size: 0.85em;
+}
+
+.main-footer p {
+    color: var(--main-color);
+    font-weight: 700;
 }
 
 .main-footer span {
-    color: #292929;
+    color: var(--black-text-color);
     font-weight: 400;
 }
 
 .game-over {
     display: none;
-
-    /* display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center; */
-
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #fff;
+    background-color: var(--white-color);
     border-radius: 10px;
     text-align: center;
     padding: 0 10px;
@@ -213,71 +219,18 @@ main {
 
 .game-over-main span {
     font-weight: 700;
-    color: #e37b7c;
+    color: var(--main-color);
 }
 
 .game-over-footer button {
-    border: 2px solid rgba(0, 0, 0, 0.2);
+    border: 2px solid var(--black-small-opacity);
     border-radius: 4px;
     padding: 8px 14px;
     font-size: 0.9em;
     font-weight: 700;
-    background-color: #e37b7c;
-    color: #fff;
+    background-color: var(--main-color);
+    color: var(--white-color);
 }
-
-
-
-
-
-.error-notification {
-    display: none;
-    position: absolute;
-    width: 90%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 15px 10px;
-    text-align: center;
-    background-color: #fff;
-    color: #292929;
-    border: 3px solid #d6d6d6;
-    box-shadow: 0 0 15px 5px rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
-}
-
-.error-notification img {
-    width: 48px;
-}
-
-.error-notification h1 {
-    font-size: 1em;
-    margin: 4px 0 5px 0;
-}
-
-.error-notification p {
-    font-size: 0.9em;
-}
-
-
-.motivation-message {
-    display: none;
-    position: absolute;
-    top: 26%;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    font-size: 0.9em;
-    color: #fff;
-    font-weight: 700;
-}
-
-.motivation-message span {
-    font-size: 1.3em;
-}
-
-
-
 
 .button-open-settings {
     position: absolute;
@@ -285,7 +238,7 @@ main {
     left: 5%;
     border: none;
     background-color: transparent;
-    color: #ffffff;
+    color: var(--white-color);
     font-size: 0.9em;
     transition: all 0.4s linear;
 }
@@ -296,12 +249,10 @@ main {
 }
 
 .settings {
-    
     /* display: flex;
     flex-direction: column;
     justify-content: flex-start; 
     height: 100vh; */
-
     display: none;
     position: fixed;
     top: 0;
@@ -311,8 +262,8 @@ main {
     overflow-y: scroll;
     scrollbar-width: none;
     z-index: 10;
-    background-color: #fff;
-    color: #292929;
+    background-color: var(--white-color);
+    color: var(--black-text-color);
 }
 
 .display-settings {
@@ -330,7 +281,7 @@ main {
 .settings-header-and-menu {
     position: sticky;
     top: 0;
-    background-color: #fff;
+    background-color: var(--white-color);
     margin-bottom: 15px;
 }
 
@@ -358,8 +309,9 @@ main {
     font-size: 1.9em;
     font-weight: 700;
     border: none;
+    color: var(--white-color);
     background-color: #d33232;
-    color: #fff;
+    transition: background-color 0.4s linear;
 }
 
 .button-close-settings:hover {
@@ -380,7 +332,7 @@ main {
     padding: 20px 10px;
     font-size: 0.95em;
     font-weight: 700;
-    color: #292929;
+    color: var(--black-text-color);
     background-color: transparent;
 }
 
@@ -405,10 +357,6 @@ main {
     margin-left: 50%;
 }
 
-/* .preferences {
-
-} */
-
 .difficulty {
     position: relative;
     width: 94%;
@@ -428,8 +376,7 @@ main {
     margin-bottom: 0;
 }
 
-.difficulty-option p:first-of-type,
-.difficulty-option p:last-of-type {
+.difficulty-option p {
     font-size: 0.9em;
 }
 
@@ -439,20 +386,20 @@ main {
 }
 
 .difficulty-option p:last-of-type {
-    color: #292929;
-    margin-bottom: 6px;
+    color: var(--black-text-color);
+    margin-bottom: 5px;
 }
 
 .difficulty-option span {
     font-weight: 700;
-    color: #e37b7c;
+    color: var(--main-color);
 }
 
 .difficulty-option button {
     padding: 8px 10px;
     text-align: left;
     border: none;
-    color: #fff;
+    color: var(--white-color);
     font-weight: 700;
     font-size: 0.9em;
     border-radius: 2px;
@@ -460,7 +407,7 @@ main {
 }
 
 .difficulty-option button:hover {
-    background-color: #ec9a9b !important;
+    background-color: var(--main-color) !important;
 }
 
 .settings hr {
@@ -468,13 +415,13 @@ main {
     width: 94%;
     border-width: 0;
     margin: 25px 3% 22px 3%;
-    color: rgba(0, 0, 0, 0.2);
-    background-color: rgba(0, 0, 0, 0.2);
+    color: var(--black-small-opacity);
+    background-color: var(--black-small-opacity);
 }
 
 .sound-effects {
     width: 94%;
-    margin: 0 3%;
+    margin: 0 auto;
 }
 
 .sound-effects h2 {
@@ -511,8 +458,13 @@ main {
     font-weight: 700;
     border: none;
     border-radius: 2px;
-    background-color: #e37b7c;
-    color: #fff;
+    background-color: var(--main-color);
+    color: var(--white-color);
+    transition: background-color 0.4s linear;
+}
+
+.sound-effects-options button:hover {
+    background-color: rgb(194, 104, 105);
 }
 
 .statistics {
@@ -535,7 +487,7 @@ main {
 .games-played-on-each-difficulty h2,
 .highest-score-on-each-difficulty h2,
 .average-score-on-each-difficulty h2 {
-    font-size: 1em;
+    font-size: 0.95em;
     margin-bottom: 5px;
 }
 
@@ -545,7 +497,7 @@ main {
 .highest-score-on-each-difficulty td,
 .average-score-on-each-difficulty table,
 .average-score-on-each-difficulty td {
-    border: 1px solid rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--black-small-opacity);
     border-collapse: collapse;
     font-size: 0.95em;
 }
@@ -571,6 +523,56 @@ main {
     font-weight: 700;
     border: none;
     border-radius: 2px;
-    background-color: #e37b7c;
-    color: #fff;
+    background-color: var(--main-color);
+    color: var(--white-color);
+    transition: background-color 0.4s linear;
+}
+
+.button-clear-statistics:hover {
+    background-color: rgb(194, 104, 105);
+}
+
+.error-notification {
+    display: none;
+    position: absolute;
+    width: 90%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 15px 10px;
+    border: 3px solid #d6d6d6;
+    border-radius: 10px;
+    text-align: center;
+    background-color: var(--white-color);
+    color: var(--black-text-color);
+    box-shadow: 0 0 15px 5px var(--black-small-opacity);
+}
+
+.error-notification img {
+    width: 48px;
+}
+
+.error-notification h1 {
+    font-size: 0.95em;
+    margin: 4px 0 5px 0;
+}
+
+.error-notification p {
+    font-size: 0.9em;
+}
+
+.motivation-message {
+    display: none;
+    position: absolute;
+    top: 26%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.9em;
+    color: var(--white-color);
+    font-weight: 700;
+}
+
+.motivation-message span {
+    font-size: 1.3em;
 }
