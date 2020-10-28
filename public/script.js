@@ -370,11 +370,13 @@ function openSettings() {
     settings.classList.add('display-settings');
     displayPreferences();
     adjustSoundEffectsOptions();
+    if (screen.width > 549) headerContainer.style.display = 'none'; 
 }
 
 function closeSettings() {
     settings.classList.remove('display-settings');
     resetGame();
+    if (screen.width > 549) headerContainer.style.display = 'block';
 }
 
 // Display the 'preferences' section in the menu. Hide the 'statistics' section.

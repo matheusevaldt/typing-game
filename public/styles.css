@@ -102,7 +102,7 @@ main {
 
 .loading-word {
     grid-area: loading-word;
-    border: 3px solid #dfdfdf;
+    border: 3px solid #d3d3d3;
     border-top: 3px solid var(--main-color);
     border-radius: 50%;
     width: 18px;
@@ -575,4 +575,57 @@ main {
 
 .motivation-message span {
     font-size: 1.3em;
+}
+
+/* Media queries */
+@media (min-width: 550px) {
+
+    header {
+        padding-top: 45px;
+    }
+    
+    header h1 {
+        font-size: 1.8em;
+        margin-bottom: 7px;
+    }
+    
+    header h2 {
+        font-size: 1em;
+    }
+    
+    main {
+        width: 500px;
+    }
+
+    .main-header h2 {
+        font-size: 0.95em;
+    }
+
+    .remaining-time {
+        font-size: 0.9em;
+    }
+
+    .input-word {
+        width: 250px;
+        font-size: 1em;
+    }
+
+    .main-footer {
+        font-size: 0.9em;
+    }
+
+    .settings {
+        width: 500px;
+        height: 85vh;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        overflow-y: hidden;
+        border: 5px solid var(--black-small-opacity);
+    }
+
+    .display-settings {
+        animation: none;
+    }
+
 }
