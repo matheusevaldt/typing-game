@@ -214,7 +214,7 @@ function startCountdown() {
 }
 
 // Whenever user types a word correctly:
-// - Check for the amount of remaining words in the array;
+// - Check for the amount of remaining words in the 'arrayOfWords';
 // - Display new word;
 // - Update score;
 // - Reset countdown;
