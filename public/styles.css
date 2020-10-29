@@ -628,4 +628,8 @@ main {
         animation: none;
     }
 
+    .error-notification {
+        width: 500px;
+    }
+
 }
