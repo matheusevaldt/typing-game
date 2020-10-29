@@ -214,20 +214,20 @@ function startCountdown() {
 }
 
 // Whenever user types a word correctly:
+// - Check for the amount of remaining words in the array;
 // - Display new word;
 // - Update score;
 // - Reset countdown;
-// - Play audio if user hasn't disabled it;
-// - Check for the amount of remaining words in the array.
+// - Play audio if user hasn't disabled it.
 function validateTyping() {
     if (inputWord.value === currentWord) {
         inputWord.value = '';
         arrayOfWords.shift();
+        keepTrackArrayOfWords();
         updateWord();
         updateCurrentScore();
         resetCountdown();
         playAudioCorrectWord();
-        keepTrackArrayOfWords();
         motivatePlayer();
     }
 }
