@@ -87,14 +87,14 @@ buttonClearStatistics.addEventListener('click', clearStatistics);
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', loadDifficultyAndTime);
         document.addEventListener('DOMContentLoaded', fetchWords);
-        document.addEventListener('DOMContentLoaded', loadHighestScores);
+        document.addEventListener('DOMContentLoaded', loadHighestScore);
         document.addEventListener('DOMContentLoaded', loadGamesPlayed);
         document.addEventListener('DOMContentLoaded', loadTotalScore);
         document.addEventListener('DOMContentLoaded', loadAverageScore);
     } else {
         loadDifficultyAndTime();
         fetchWords(arrayOfWords);
-        loadHighestScores();
+        loadHighestScore();
         loadGamesPlayed();
         loadTotalScore();
         loadAverageScore();
@@ -108,7 +108,7 @@ function loadDifficultyAndTime() {
     timer = $timer;
 }
 
-function loadHighestScores() {
+function loadHighestScore() {
     $highestScoreOnEasy === null ? updateHighestScoreOnEasy(0) : updateHighestScoreOnEasy($highestScoreOnEasy);
     $highestScoreOnMedium === null ? updateHighestScoreOnMedium(0) : updateHighestScoreOnMedium($highestScoreOnMedium);
     $highestScoreOnHard === null ? updateHighestScoreOnHard(0) : updateHighestScoreOnHard($highestScoreOnHard);

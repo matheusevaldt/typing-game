@@ -98,6 +98,7 @@ main {
 .load-and-display-word {
     display: grid;
     grid-template-areas: "loading-word";
+    pointer-events: none;
 }
 
 .loading-word {
@@ -249,10 +250,6 @@ main {
 }
 
 .settings {
-    /* display: flex;
-    flex-direction: column;
-    justify-content: flex-start; 
-    height: 100vh; */
     display: none;
     position: fixed;
     top: 0;
@@ -630,6 +627,10 @@ main {
 
     .error-notification {
         width: 500px;
+    }
+
+    .motivation-message {
+        top: 33%;
     }
 
 }
